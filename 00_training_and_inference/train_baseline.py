@@ -14,12 +14,12 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from os.path import join
 
 # Set CUDA architecture list and float32 matmul precision high
-from sgmse.util.other import set_torch_cuda_arch_list
+from sgmsvs.sgmse.util.other import set_torch_cuda_arch_list
 set_torch_cuda_arch_list()
 torch.set_float32_matmul_precision('high')
 
 from baseline_models.backbones.shared import BackboneRegistry
-from sgmse.data_module import SpecsDataModule
+from sgmsvs.data_module import SpecsDataModule
 #from sgmse.sdes import SDERegistry
 from baseline_models.MSS_mask_model import MaskingModel
 
