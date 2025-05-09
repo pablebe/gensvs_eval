@@ -261,4 +261,4 @@ dependencies:
       - widgetsnbextension==4.0.13
       - yarl==1.15.2
 variables:
-  CUDA_HOME: /home/bereuter/miniconda3/envs/sgmse_env
+  CUDA_HOME: "PATH_TO_CONDA_ENV!!!"
