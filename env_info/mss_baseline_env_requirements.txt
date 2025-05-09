@@ -9,3 +9,8 @@ tqdm
 librosa
 auraloss
 einops
+beartype
+rotary-embedding-torch
+omegaconf
+demucs
+openunmix

@@ -23,7 +23,7 @@ from sgmsvs.data_module import SpecsDataModule
 #from sgmse.sdes import SDERegistry
 from baseline_models.MSS_mask_model import MaskingModel
 
-wandb.login()
+#wandb.login() #!!!Uncomment this line if you want to login to wandb!!!
 
 def get_argparse_groups(parser):
      groups = {}
