@@ -85,8 +85,9 @@ The used third party folders are the following:
       year={2023},
       eprint={2305.07489},
       archivePrefix={arXiv},
+      howpublished={\url{https://github.com/ZFTurbo/Music-Source-Separation-Training}},
       primaryClass={cs.SD},
-      url={https://github.com/ZFTurbo/MVSEP-MDX23-music-separation-model}
+      url={https://github.com/ZFTurbo/Music-Source-Separation-Training}
       }
 ```
 ```bib
