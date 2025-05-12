@@ -9,18 +9,19 @@ Contains all code required to carry out training and inference for all the model
 ### Training
 #### ./00_training_and_inference/train_baseline.py
 This python-script was adapted from [1] and can be used to train HTDemucs and Mel-RoFo. (S)
+The baseline model classes were taken from [2] and [3].
 
 #### ./00_training_and_inference/train_sgmsvs.py
 This python-script was adapted from [1] and can be used to train the SGMSVS model (train_sgmsvs.py).
 
 #### ./00_training_and_inference/train_finetuned_bigvgan.py
-This python-script was adapted from [2] and can be used to task-specifically finetune the vocoder-based BigVGAN for singing voice separation.
+This python-script was adapted from [4] and can be used to task-specifically finetune the vocoder-based BigVGAN for singing voice separation.
 ### Inference
 
 ## 01_objective_evaluation
 Contains the code to compute all objective evaluation metrics and all *.csv files of the evaluated objective audio quality metrics.
 
-Note: to compute ViSQOL metrics the ViSQOL API from [3] has to be installed locally. 
+Note: to compute ViSQOL metrics the ViSQOL API from [4] has to be installed locally. 
 
 
 ## 02_subjective_evaluation
@@ -64,4 +65,24 @@ The used third party folders are the following:
     - Reference: [1]
 
 ## References:
-[1]
+[1] @article{richter2023speech,
+  title={Speech Enhancement and Dereverberation with Diffusion-based Generative Models},
+  author={Richter, Julius and Welker, Simon and Lemercier, Jean-Marie and Lay, Bunlong and Gerkmann, Timo},
+  journal={IEEE/ACM Transactions on Audio, Speech, and Language Processing},
+  volume={31},
+  pages={2351-2364},
+  year={2023},
+  doi={10.1109/TASLP.2023.3285241}
+}
+
+[2] @misc{solovyev2023benchmarks,
+      title={Benchmarks and leaderboards for sound demixing tasks}, 
+      author={Roman Solovyev and Alexander Stempkovskiy and Tatiana Habruseva},
+      year={2023},
+      eprint={2305.07489},
+      archivePrefix={arXiv},
+      primaryClass={cs.SD},
+      url={https://github.com/ZFTurbo/MVSEP-MDX23-music-separation-model}
+      }
+
+[3] 
