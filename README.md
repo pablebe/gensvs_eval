@@ -64,8 +64,11 @@ The used third party folders are the following:
 - Path: 00_training_and_inference/sgmsvs/sgmse
     - Reference: [1]
 
-## References:
-[1] @article{richter2023speech,
+## References and Citations:
+[1] 
+
+'''bib
+@article{richter2023speech,
   title={Speech Enhancement and Dereverberation with Diffusion-based Generative Models},
   author={Richter, Julius and Welker, Simon and Lemercier, Jean-Marie and Lay, Bunlong and Gerkmann, Timo},
   journal={IEEE/ACM Transactions on Audio, Speech, and Language Processing},
@@ -74,8 +77,9 @@ The used third party folders are the following:
   year={2023},
   doi={10.1109/TASLP.2023.3285241}
 }
-
-[2] @misc{solovyev2023benchmarks,
+'''
+'''bib
+@misc{solovyev2023benchmarks,
       title={Benchmarks and leaderboards for sound demixing tasks}, 
       author={Roman Solovyev and Alexander Stempkovskiy and Tatiana Habruseva},
       year={2023},
@@ -84,5 +88,4 @@ The used third party folders are the following:
       primaryClass={cs.SD},
       url={https://github.com/ZFTurbo/MVSEP-MDX23-music-separation-model}
       }
-
-[3] 
+'''
