@@ -1,6 +1,6 @@
 import glob
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
 import argparse
 import torch.nn.functional as F
@@ -63,8 +63,15 @@ if __name__ == '__main__':
 
         # Load wav
         y, sr = load(noisy_file)
-        num_frames = int(np.ceil(y.shape[1] / model.dnn.stft_kwargs['hop_length']))
-        target_len = (num_frames ) * model.dnn.stft_kwargs['hop_length']
+        if model.backbone == 'mel_band_roformer':
+            num_frames = int(np.ceil(y.shape[1] / model.dnn.stft_kwargs['hop_length']))
+            target_len = (num_frames ) * model.dnn.stft_kwargs['hop_length']
+        elif model.backbone == 'htdemucs':
+            num_frames = int(np.ceil(y.shape[1] / model.dnn.hop_length))
+            target_len = (num_frames ) * model.dnn.hop_length
+        else:
+            raise ValueError("Unknown model backbone: {}".format(model.backbone))
+            
         current_len = y.size(-1)
         pad = max(target_len - current_len, 0)
         if pad != 0:

@@ -22,7 +22,7 @@ The folder 00_training_and_inference contains all code required to carry out tra
 In order to find out on how to start the training of each model you can the bash-files ```*.sh```
 
 In order to resume training or use 
-The trained models (HTDemucs, Mel-Rofo. (S), SGMSVS and the finetuned BigVGAN) can be found here: <url>https://drive.google.com/drive/folders/1X7IYRgXrPkpL7M9kXQE-lp5Yx9-0iGMX</url>
+The trained models (HTDemucs, Mel-Rofo. (S), SGMSVS and the finetuned BigVGAN) can be found here: <url>https://drive.google.com/drive/folders/13D_0ciDODkNv9q5W9l2s2WsmpHlZJvnS?usp=sharing</url>
 >
 The model checkpoint for Mel-Rofo. (L) was taken from [3].
 
@@ -50,8 +50,7 @@ It also allows to reproduce the correlation analysis results of the paper.
 
 
 ## 🎼 Audio Examples
-In 03_audio_examples 12 audio examples of each model can be found in this folder.
-
+In the folder ```03_audio_examples``` 12 audio examples of each model can be found. The audio examples are loudness normalized to -18 dBFS according to EBU R128.
 
 ## trained models
 The trained models used in this paper can be downloaded from <add-url-here>

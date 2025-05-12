@@ -6,7 +6,7 @@ import torch.nn as nn
 
 def get_model_from_config(model_type, config):
     if model_type == 'mel_band_roformer':
-        from backbones.mel_band_roformer import MelBandRoformer
+        from baseline_models.backbones.mel_band_roformer import MelBandRoformer
         model = MelBandRoformer(
             **dict(config.model)
         )

@@ -55,11 +55,6 @@ def run_folder(model, args, config, device, verbose=False):
             vocals_path = "{}/{}_{}_{}.wav".format(args.store_dir,'separated',instr, os.path.basename(path)[:-4].split('mixture_')[-1])#os.path.basename(path)[:-4])
             sf.write(vocals_path, res[instr].T, sr, subtype='FLOAT')
 
-        vocals = res[instruments[0]].T
-        instrumental = mix - vocals
-        instrumental_path = "{}/{}_instrumental.wav".format(args.store_dir, os.path.basename(path)[:-4])
-        sf.write(instrumental_path, instrumental, sr, subtype='FLOAT')
-
     time.sleep(1)
     print("Elapsed time: {:.2f} sec".format(time.time() - start_time))
 

@@ -1,6 +1,6 @@
 import glob
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
 import argparse
 import torch.nn.functional as F

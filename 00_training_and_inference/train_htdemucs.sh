@@ -21,8 +21,6 @@ python ./00_training_and_inference/train_baseline.py \
     --batch_size "6" \
     --num_workers "14" \
     --sr "48000" \
-    --n_fft "2048" \
-    --hop_length "512" \
     --masked_mse_coarse "true" \
     --masked_mse_q "0.95" \
     --channels "48" \

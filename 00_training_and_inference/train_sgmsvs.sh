@@ -34,4 +34,4 @@ python ./00_training_and_inference/train_sgmsvs.py \
         --theta 2.0 \
         --max_epoch 550 \
         --nolog \
-    #    --ckpt "./trained_model/sgmsvs.ckpt" \
+    #    --ckpt trained_models/sgmsvs/epoch=510-sdr=7.22.ckpt \

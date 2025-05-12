@@ -32,4 +32,4 @@ python ./00_training_and_inference/train_baseline.py \
     --num_eval_files "50" \
     --max_epochs "550" \
     --nolog \
-#    --ckpt "./trained_model/mel_band_roformer.ckpt" \
+#    --ckpt "./trained_models/melroformer_small/epoch=548-sdr=8.85_new.ckpt" \
