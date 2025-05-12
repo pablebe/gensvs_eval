@@ -62,7 +62,7 @@ The used third party folders are the following:
     - Reference: [1]
 
 ## References:
-[1] SGMSE 
+[1] Julius Richter, Simon Welker, Jean-Marie Lemercier, Bunlong Lay, Timo Gerkmann. "Speech Enhancement and Dereverberation with Diffusion-Based Generative Models", IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 31, pp. 2351-2364, 2023, Git Repository: <url>https://github.com/sp-uhh/sgmse</url>  
 [2] MVSEP
 [3] Mel-band RoFormer
 [4] BigVGAN
