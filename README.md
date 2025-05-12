@@ -4,7 +4,7 @@ This repository accompanies the submission titled "Towards Reliable Objective Ev
 The repository is organized in four subfolders with the following contents:
 
 ## 00_training_and_inference
-Contains all code required to carry out training and inference for all the models mentionedin the paper.
+Contains all code required to carry out training and inference for all the models mentioned in the paper.
 
 ### Training
 #### ./00_training_and_inference/train_baseline.py
@@ -25,9 +25,9 @@ Note: to compute ViSQOL metrics the ViSQOL API from [4] has to be installed loca
 
 
 ## 02_subjective_evaluation
-This folder contains the DMOS data collected with a degredation category rating. \n
+This folder contains the DMOS data collected with a degradation category rating. \n
 It also contains code to analyze the listening test results. 
-This folder contains the DMOS data collected with a degredation category rating. \n
+This folder contains the DMOS data collected with a degradation category rating. \n
 It also contains code to analyze the listening test results. 
 
 ## 03_correlation_analysis
@@ -64,8 +64,11 @@ The used third party folders are the following:
 - Path: 00_training_and_inference/sgmsvs/sgmse
     - Reference: [1]
 
-## References and Citations:
-[1] 
+## References:
+[1] SGMSE 
+[2] MVSEP
+[3] Mel-band RoFormer
+[4] BigVGAN
 
 ```bib
 @article{richter2023speech,
@@ -89,3 +92,25 @@ The used third party folders are the following:
       url={https://github.com/ZFTurbo/MVSEP-MDX23-music-separation-model}
       }
 ```
+```bib
+@misc{jensen2024melbandroformer,
+  author       = {Kimberley Jensen},
+  title        = {Mel-Band-Roformer-Vocal-Model},
+  year         = {2024},
+  howpublished = {\url{https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model}},
+  note         = {GitHub repository},
+  url          = {https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model}
+}
+```
+```bib
+@inproceedings{
+lee2023bigvgan,
+title={Big{VGAN}: A Universal Neural Vocoder with Large-Scale Training},
+author={Sang-gil Lee and Wei Ping and Boris Ginsburg and Bryan Catanzaro and Sungroh Yoon},
+booktitle=iclr,
+year={2023},
+url={https://openreview.net/forum?id=iTtGCMDEzS_}
+}
+```
+
+## Cite This Work:
