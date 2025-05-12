@@ -1,3 +1,4 @@
 *.pyc
 .vscode/launch.json
 00_training_and_inference/lightning_logs
+trained_models

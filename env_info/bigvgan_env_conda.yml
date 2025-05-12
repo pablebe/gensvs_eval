@@ -1,0 +1,9 @@
+name: gensvs_eval_bigvgan_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10.16=he870216_1
+variables:
+  CUDA_HOME: /home/bereuter/miniconda3/envs/gensvs_eval_bigvgan_env
+

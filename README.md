@@ -5,6 +5,23 @@ The repository is organized in four subfolders with the following contents:
 
 ## 00_training_and_inference
 Contains all code required to carry out training and inference for all the models mentioned in the paper.
+
+>Set up conda environment for **HTDemucs** and **Mel-RoFo. (S)**:
+> 1. ```conda env create -f ./env_info/mss_baseline_env_conda.yml```
+> 2. ```pip install -r ./env_info/mss_baseline_env_requirements.txt```
+
+>Set up onda environment for **SGMSVS** model:
+> 1. set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
+> 2. ```conda env create -f ./env_info/sgmsvs_env_conda.yml```
+> 3. ```pip install -r ./env_info/sgmsvs_env.txt```
+
+>Set up conda environment for finetuning **BigVGAN** (**Mel-RoFo. (S)+BigVGAN**):
+> 1. ```conda env create -f ./env_info/bigvgan_env.yml```
+> 2. ```pip install -r ./env_info/bigvgan_env_requirements.txt```
+
+In order to find out on how to start the training of each model you can the bash-files ```*.sh```
+
+In order to resume training or use 
 The trained models (HTDemucs, Mel-Rofo. (S), SGMSVS and the finetuned BigVGAN) can be found here: <url>https://drive.google.com/drive/folders/1X7IYRgXrPkpL7M9kXQE-lp5Yx9-0iGMX</url>
 >
 The model checkpoint for Mel-Rofo. (L) was taken from [3].
