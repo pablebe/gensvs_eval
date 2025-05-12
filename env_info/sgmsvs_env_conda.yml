@@ -7,5 +7,5 @@ dependencies:
   - python=3.11.8=hab00c5b_0_cpython
   - cuda=12.6.2=0
 variables:
-  CUDA_HOME: /home/bereuter/miniconda3/envs/gensvs_eval_sgmsvs_env
+  CUDA_HOME: <!!add-path-to-conda-environments-here!!>/gensvs_eval_sgmsvs_env
 
