@@ -52,19 +52,7 @@ It also allows to reproduce the correlation analysis results of the paper.
 ## 🎼 Audio Examples
 In the folder ```03_audio_examples``` 12 audio examples of each model can be found. The audio examples are loudness normalized to -18 dBFS according to EBU R128.
 
-## trained models
-The trained models used in this paper can be downloaded from <add-url-here>
-12 audio examples of each model can be found in this folder.
 
-## env_info
-Contains the *.yml files to create the conda environments and *.txt requirements to install all packages using pip.
-All environments were tested using a Debian machine. 
-To create one of the environments carry out the following steps:
-1.) conda create 
-2.) pip install ...
-
-## trained models
-The trained models used in this paper can be downloaded from <add-url-here>
 
 ## Third party code
 ### Third party folders

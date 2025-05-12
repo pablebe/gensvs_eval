@@ -4,24 +4,24 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
 import argparse
 import torch.nn.functional as F
+import numpy as np
 from tqdm import tqdm
 from os import makedirs
 from soundfile import write
 from torchaudio import load
 from os.path import join, dirname
 from argparse import ArgumentParser
-from librosa import resample
 # Set CUDA architecture list
-from sgmse.util.other import set_torch_cuda_arch_list
+from sgmsvs.sgmse.util.other import set_torch_cuda_arch_list
 set_torch_cuda_arch_list()
 
-from sgmse.MSS_model import ScoreModel
-from sgmse.util.other import pad_spec
+from sgmsvs.MSS_model import ScoreModel
+from sgmsvs.sgmse.util.other import pad_spec
+from sgmsvs.loudness import calculate_loudness
 
-SIG_LEN = 15#s
-N_FRAMES = 625
-HOP_LEN = 384
 CH_BY_CH_PROCESSING = True
+FADE_LEN = 0.1 # seconds
+LOUDNESS_LEVEL = -18 # dBFS
 
 def get_argparse_groups(parser):
      groups = {}
@@ -42,6 +42,10 @@ if __name__ == '__main__':
     parser.add_argument("--N", type=int, default=35, help="Number of reverse steps")
     parser.add_argument("--device", type=str, default="cuda", help="Device to use for inference")
     parser.add_argument("--t_eps", type=float, default=0.03, help="The minimum process time (0.03 by default)")
+    parser.add_argument("--output_mono", action="store_true", default=False, help="Whether to output mono audio.")
+    parser.add_argument("--loudness_normalize", action="store_true", default=False, help="Whether to normalize the loudness of the output audio.")
+    
+    
     args = parser.parse_args()
 
     if not(torch.cuda.is_available()):
@@ -146,7 +150,24 @@ if __name__ == '__main__':
         if y.shape[0]>1:
             #if stereo put channel dimenion last
             x_hat = x_hat.T
+            
+        if args.output_mono:
+            audio_mono = x_hat[:,0].cpu().numpy()
+            fade_in = np.linspace(0, 1, int(FADE_LEN*sr))
+            fade_out = np.linspace(1, 0, int(FADE_LEN*sr))
+            audio_mono[:int(FADE_LEN*sr)] *= fade_in
+            audio_mono[-int(FADE_LEN*sr):] *= fade_out
+            x_hat = np.stack((audio_mono, audio_mono), axis=1)
+        else:
+            x_hat  = x_hat.cpu().numpy()
+            
+        if args.loudness_normalize:
+            L_audio = calculate_loudness(x_hat, sr)
+            L_diff_goal_audio = LOUDNESS_LEVEL - L_audio
+            k_scale_audio = 10**(L_diff_goal_audio/20)
+            x_hat = x_hat * k_scale_audio
+            
         # Write enhanced wav file
         filename = 'separated_vocals_'+filename.split('mixture_')[-1]
         makedirs(dirname(join(args.enhanced_dir,filename)), exist_ok=True)
-        write(join(args.enhanced_dir, filename), x_hat.cpu().numpy(), target_sr)
+        write(join(args.enhanced_dir, filename), x_hat, target_sr)

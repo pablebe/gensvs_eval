@@ -1,3 +1,9 @@
+# Copyright (c) 2025
+#   Licensed under the MIT license.
+
+# Adapted from https://github.com/NVIDIA/BigVGAN/tree/main under the MIT license.
+#   LICENSE is in incl_licenses directory.
+
 import glob
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -16,20 +22,18 @@ from os.path import join, dirname
 from argparse import ArgumentParser
 from librosa import resample
 # Set CUDA architecture list
-from sgmse.util.other import set_torch_cuda_arch_list
+from sgmsvs.sgmse.util.other import set_torch_cuda_arch_list
 set_torch_cuda_arch_list()
-from einops import rearrange
-#.MSS_model import ScoreModel
-from sgmse.util.other import pad_spec
 from bigvgan_utils.bigvgan import BigVGAN
 from baseline_models.MSS_mask_model import MaskingModel
 from bigvgan_utils.env import AttrDict
 from bigvgan_utils.utils import load_checkpoint
-from bigvgan_utils.meldataset import spectral_normalize_torch, get_mel_spectrogram, mel_spectrogram
-from bigvgan_utils.utils import load_checkpoint as load_bigvgan_checkpoint
-
+from bigvgan_utils.meldataset import mel_spectrogram
+from sgmsvs.loudness import calculate_loudness
 
 SAVE_MELROFORM_AUDIO = False
+FADE_LEN = 0.1 # seconds
+LOUDNESS_LEVEL = -18 # dBFS
 
 def get_argparse_groups(parser):
      groups = {}
@@ -47,11 +51,12 @@ if __name__ == '__main__':
     parser.add_argument("--bigvgan_config_file", type=str, default=None, required=True, help="Path to the config file for the BigVGAN model.")
     parser.add_argument("--bigvgan_checkpoint", type=str, default=None, required=True, help="Path to the checkpoint file for the BigVGAN model.")
     parser.add_argument("--bigvgan_use_cuda_kernel", action="store_true", default=False, help="Whether to use the CUDA kernel for the BigVGAN model.")
+    parser.add_argument("--output_mono", action="store_true", default=False, help="Whether to output mono audio.")
+    parser.add_argument("--loudness_normalize", action="store_true", default=False, help="Whether to normalize the loudness of the output audio.")
     args = parser.parse_args()
     
     if not(torch.cuda.is_available()):
         args.device = torch.device("cpu")
-#    ckpt = torch.load(args.ckpt, map_location=args.device, weights_only = False)
     with open(args.bigvgan_config_file) as f:
         data = f.read()
     json_config = json.loads(data)
@@ -114,19 +119,32 @@ if __name__ == '__main__':
             x_hat = bigvgan(mel_sep).squeeze()
             x_hat = x_hat[:,pad//2:-(pad//2+(pad%2))]
             sep_audio = sep_audio[:,pad//2:-(pad//2+(pad%2))]
-#            mel_enh = rearrange(mel_enh, 'b n m t -> (b n) m t')
-#            mel_enh = spectral_normalize_torch(mel_enh)
-#            x_hat = bigvgan(mel_enh.detach())          
-#            x_hat = x_hat.squeeze().detach()
-        # Renormalize
-        
+
         if y.shape[0]>1:
             #if stereo put channel dimenion last
             x_hat = x_hat.T
+            
+        if args.output_mono:           
+            audio_mono = x_hat[:,0].cpu()
+            fade_in = np.linspace(0, 1, int(FADE_LEN*sr))
+            fade_out = np.linspace(1, 0, int(FADE_LEN*sr))
+            audio_mono[:int(FADE_LEN*sr)] *= fade_in
+            audio_mono[-int(FADE_LEN*sr):] *= fade_out
+            x_hat = np.stack((audio_mono, audio_mono), axis=1)
+        else:
+            x_hat = x_hat.cpu().numpy()
+            
+        if args.loudness_normalize:
+            # Normalize loudness
+            L_audio = calculate_loudness(x_hat, sr)
+            L_diff_goal_audio = LOUDNESS_LEVEL - L_audio
+            k_scale_audio = 10**(L_diff_goal_audio/20)
+            x_hat = x_hat * k_scale_audio
+        
         # Write enhanced wav file
         filename = 'separated_vocals_'+filename.split('mixture_')[-1]
         makedirs(dirname(join(args.enhanced_dir,filename)), exist_ok=True)
-        write(join(args.enhanced_dir, filename), x_hat.cpu().numpy(), target_sr)
+        write(join(args.enhanced_dir, filename), x_hat, target_sr)
         if SAVE_MELROFORM_AUDIO:
             makedirs(dirname(join(os.path.sep.join(args.enhanced_dir.split(os.path.sep)[:-1]),'separated_melroformer_small_from_bigvgan',filename)), exist_ok=True)
             write(join(os.path.sep.join(args.enhanced_dir.split(os.path.sep)[:-1]),'separated_melroformer_small_from_bigvgan', filename), sep_audio.cpu().numpy().T, target_sr)
