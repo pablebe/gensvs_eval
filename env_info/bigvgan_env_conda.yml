@@ -5,5 +5,5 @@ channels:
 dependencies:
   - python=3.10.16=he870216_1
 variables:
-  CUDA_HOME: <!!add-path-to-conda-environments-here!!>/envs/gensvs_eval_bigvgan_env
+  CUDA_HOME: <!!add-path-to-conda-environments-here!!>/gensvs_eval_bigvgan_env
 
