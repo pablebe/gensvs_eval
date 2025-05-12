@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Training parameters for HTDemucs
+# --base_idr: Base directory where moisesdb and musdb18hq are located
+# --ckpt: uncomment this to resume training from a checkpoint
 python train_baseline.py \
     --base_dir "/media/DATA/shared/datasets/MSS_datasets" \
     --format "MSS" \
@@ -85,4 +87,4 @@ python train_baseline.py \
     --run_id "2502041728_htdemucs_large_l1_loss" \
     --num_eval_files "50" \
     --nolog \
-    --ckpt "./logs/2502041728_htdemucs_large_l1_loss/last.ckpt"
+#    --ckpt "./logs/2502041728_htdemucs_large_l1_loss/last.ckpt"
