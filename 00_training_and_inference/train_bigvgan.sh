@@ -22,5 +22,5 @@ python ./00_training_and_inference/train_finetune_bigvgan.py \
         --run_id "melroform_bigvgan_finetuned" \
         --checkpoint_path "./logs/melroform_bigvgan_finetuned" \
         --bigvgan_ckpt_path "./trained_models/bigvgan_finetuned" \
-        --bigvgan_config "./bigvgan_utils/configs/bigvgan_v2_44khz_128band_512x.json" \
-        --melroformer_ckpt "./trained_models/melroformer_small/epoch=548-sdr=8.85.ckpt" \
+        --bigvgan_config "./00_training_and_inference/bigvgan_utils/configs/bigvgan_v2_44khz_128band_512x.json" \
+        --melroformer_ckpt "./trained_models/melroformer_small/epoch=548-sdr=8.85_new.ckpt" \

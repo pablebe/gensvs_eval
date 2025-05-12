@@ -6,7 +6,7 @@
 
 import os
 #os.environ["WANDB_API_KEY"] = "" # set your wandb key here
-#os.environ["CUDA_VISIBLE_DEVICES"] = "0" # set your CUDA device here
+os.environ["CUDA_VISIBLE_DEVICES"] = "0" # set your CUDA device here
 os.environ["WANDB__SERVICE_WAIT"] = "300"
 
 import torch
@@ -155,3 +155,4 @@ if __name__ == '__main__':
      
      # Train the model
      trainer.fit(model, ckpt_path=args.ckpt)
+

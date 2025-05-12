@@ -1,7 +1,7 @@
 # Copyright (c) 2025
 #   Licensed under the MIT license.
 
-# Adapted from https://github.com/jik876/hifi-gan under the MIT license.
+# Adapted from https://github.com/NVIDIA/BigVGAN/tree/main under the MIT license.
 #   LICENSE is in incl_licenses directory.
 
 
@@ -22,18 +22,19 @@ import torch.nn.functional as F
 import numpy as np
 import wandb
 import tqdm
-#from torch.utils.tensorboard import SummaryWriter
-from pytorch_lightning.loggers import WandbLogger
+import auraloss
+import torch.multiprocessing as mp
+import torchaudio as ta
+
 from baseline_models.MSS_mask_model import MaskingModel #.MSS_model import ScoreModel
 
 from torch import einsum
 from torch.utils.data import DistributedSampler, DataLoader
-import torch.multiprocessing as mp
 from torch.distributed import init_process_group
 from torch.nn.parallel import DistributedDataParallel
 from bigvgan_utils.env import AttrDict, build_env
 from bigvgan_utils.meldataset import spectral_normalize_torch, MelDataset, mel_spectrogram, get_dataset_filelist, MAX_WAV_VALUE
-from sgmsvs.sgmse.data_module import MSSSpecs
+from sgmsvs.data_module import MSSSpecs
 from bigvgan_utils.bigvgan import BigVGAN
 from bigvgan_utils.discriminators import (
     MultiPeriodDiscriminator,
@@ -55,10 +56,13 @@ from bigvgan_utils.utils import (
     save_checkpoint,
     save_audio,
 )
-import torchaudio as ta
 from pesq import pesq
 from tqdm import tqdm
-import auraloss
+#from torch.serialization import add_safe_globals
+#from sgmsvs.data_module import SpecsDataModule  # new path
+
+#add_safe_globals([SpecsDataModule])
+#torch.serialization.safe_globals([SpecsDataModule])
 
 wandb.login()
 torch.backends.cudnn.benchmark = False

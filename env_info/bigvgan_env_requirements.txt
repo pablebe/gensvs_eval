@@ -1,4 +1,6 @@
 torch
+torchaudio
+torch-ema
 numpy
 librosa>=0.8.1
 scipy
@@ -13,3 +15,10 @@ ninja
 huggingface_hub>=0.23.4
 wandb
 auraloss
+pytorch-lightning
+einops
+beartype
+rotary-embedding-torch
+omegaconf
+demucs
+ptflops

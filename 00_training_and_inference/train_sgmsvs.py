@@ -5,7 +5,7 @@
 
 
 import os
-#os.environ["CUDA_VISIBLE_DEVICES"] = "0" # set your CUDA device here
+os.environ["CUDA_VISIBLE_DEVICES"] = "0" # set your CUDA device here
 os.environ["WANDB__SERVICE_WAIT"] = "300"
 
 
@@ -167,3 +167,5 @@ if __name__ == '__main__':
           model.valid_ct += 1
      # Train model
      trainer.fit(model, ckpt_path=args.ckpt)
+     trainer.fit_loop.epoch_progress.current.completed=trainer.current_epoch-1
+     trainer.save_checkpoint("trained_models/sgmsvs/epoch=510-sdr=7.22_new.ckpt")

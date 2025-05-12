@@ -1,23 +1,23 @@
 # Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation
 This repository accompanies the submission titled "Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation".
 
-The repository is organized in four subfolders with the following contents:
+## 🚀 Getting Started
+> ### Conda environment for **HTDemucs** and **Mel-RoFo. (S)**:
+> 1. ```$ conda env create -f ./env_info/mss_baseline_env_conda.yml```
+> 2. ```$ pip install -r ./env_info/mss_baseline_env_requirements.txt```
 
-## 00_training_and_inference
-Contains all code required to carry out training and inference for all the models mentioned in the paper.
-
->Set up conda environment for **HTDemucs** and **Mel-RoFo. (S)**:
-> 1. ```conda env create -f ./env_info/mss_baseline_env_conda.yml```
-> 2. ```pip install -r ./env_info/mss_baseline_env_requirements.txt```
-
->Set up onda environment for **SGMSVS** model:
+> ### Conda environment for **SGMSVS** model:
 > 1. set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
-> 2. ```conda env create -f ./env_info/sgmsvs_env_conda.yml```
-> 3. ```pip install -r ./env_info/sgmsvs_env.txt```
+> 2. ```$ conda env create -f ./env_info/sgmsvs_env_conda.yml```
+> 3. ```$ pip install -r ./env_info/sgmsvs_env.txt```
 
->Set up conda environment for finetuning **BigVGAN** (**Mel-RoFo. (S)+BigVGAN**):
-> 1. ```conda env create -f ./env_info/bigvgan_env.yml```
-> 2. ```pip install -r ./env_info/bigvgan_env_requirements.txt```
+> ### Conda environment for finetuning **BigVGAN** (**Mel-RoFo. (S)+BigVGAN**):
+> 1. set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
+> 2. ```$ conda env create -f ./env_info/bigvgan_env.yml```
+> 3. ```$ pip install -r ./env_info/bigvgan_env_requirements.txt```
+
+## 🏋🏽‍♀️🏃🏽‍♀️‍➡️ Training and Inference
+The folder 00_training_and_inference contains all code required to carry out training and inference for all the models mentioned in the paper.
 
 In order to find out on how to start the training of each model you can the bash-files ```*.sh```
 
@@ -38,8 +38,8 @@ This python-script was adapted from [1] and can be used to train the SGMSVS mode
 This python-script was adapted from [4] and can be used to task-specifically finetune the vocoder-based BigVGAN for singing voice separation.
 ### Inference
 
-## 01_evaluation_and_correlation
-Contains the code to compute all objective evaluation metrics and all *.csv files of the evaluated objective audio quality metrics.
+## 🧮 Evaluation and Correlation Analysis
+01_evaluation_and_correlation contains the code to compute all objective evaluation metrics and all *.csv files of the evaluated objective audio quality metrics.
 
 Note: to compute ViSQOL metrics the ViSQOL API from <url>https://github.com/google/visqol</url> has to be installed locally. 
 
@@ -49,15 +49,9 @@ It also contains code to analyze the listening test results.
 It also allows to reproduce the correlation analysis results of the paper.
 
 
-## 03_audio_examples
-12 audio examples of each model can be found in this folder.
+## 🎼 Audio Examples
+In 03_audio_examples 12 audio examples of each model can be found in this folder.
 
-## env_info
-Contains the *.yml files to create the conda environments and *.txt requirements to install all packages using pip.
-All environments were tested using a Debian machine. 
-To create one of the environments carry out the following steps:
-1.) conda create 
-2.) pip install ...
 
 ## trained models
 The trained models used in this paper can be downloaded from <add-url-here>
