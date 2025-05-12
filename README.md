@@ -18,21 +18,18 @@ This python-script was adapted from [1] and can be used to train the SGMSVS mode
 This python-script was adapted from [4] and can be used to task-specifically finetune the vocoder-based BigVGAN for singing voice separation.
 ### Inference
 
-## 01_objective_evaluation
+## 01_evaluation_and_correlation
 Contains the code to compute all objective evaluation metrics and all *.csv files of the evaluated objective audio quality metrics.
 
-Note: to compute ViSQOL metrics the ViSQOL API from [4] has to be installed locally. 
+Note: to compute ViSQOL metrics the ViSQOL API from <url>https://github.com/google/visqol</url> has to be installed locally. 
 
-
-## 02_subjective_evaluation
-This folder contains the DMOS data collected with a degradation category rating. \n
-It also contains code to analyze the listening test results. 
 This folder contains the DMOS data collected with a degradation category rating. \n
 It also contains code to analyze the listening test results. 
 
-## 03_correlation_analysis
+It also allows to reproduce the correlation analysis results of the paper.
 
-## 04_audio_examples
+
+## 03_audio_examples
 12 audio examples of each model can be found in this folder.
 
 ## env_info
