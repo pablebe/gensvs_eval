@@ -1,7 +1,7 @@
 
 import os
 #os.environ["WANDB_API_KEY"] = "" # set your wandb key here
-#os.environ["CUDA_VISIBLE_DEVICES"] = "2" # set your CUDA device here
+os.environ["CUDA_VISIBLE_DEVICES"] = "0" # set your CUDA device here
 os.environ["WANDB__SERVICE_WAIT"] = "300"
 
 import torch

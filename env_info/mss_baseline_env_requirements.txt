@@ -14,3 +14,4 @@ rotary-embedding-torch
 omegaconf
 demucs
 openunmix
+ptflops
