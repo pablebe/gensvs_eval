@@ -1,4 +1,4 @@
-name: mss_baseline_env
+name: gensvs_eval_baseline_env
 channels:
   - conda-forge
   - defaults

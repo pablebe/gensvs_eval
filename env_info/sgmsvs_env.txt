@@ -1,0 +1,13 @@
+torch
+torchaudio
+torchmetrics
+torch-ema
+wandb
+pytorch-lightning
+soundfile
+tqdm
+ptflops
+auraloss
+scipy
+ninja 
+librosa

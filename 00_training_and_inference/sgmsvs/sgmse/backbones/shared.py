@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from sgmse.util.registry import Registry
+from sgmsvs.sgmse.util.registry import Registry
 
 
 BackboneRegistry = Registry("Backbone")

@@ -19,10 +19,9 @@ from auraloss.freq import MultiResolutionSTFTLoss
 from sgmsvs.sgmse import sampling
 from sgmsvs.sgmse.sdes import SDERegistry
 from sgmsvs.sgmse.backbones import BackboneRegistry
+from sgmsvs.sgmse.util.inference import evaluate_model
 from sgmsvs.sgmse.util.other import pad_spec, si_sdr
 
-
-#TODO: when logging metrics with multiple gpu training => metrics need to be logged globally! => use method validation step end (see: https://stackoverflow.com/questions/66854148/proper-way-to-log-things-when-using-pytorch-lightning-ddp)
 class ScoreModel(pl.LightningModule):
     @staticmethod
     def add_argparse_args(parser):
@@ -194,9 +193,6 @@ class ScoreModel(pl.LightningModule):
             else:
                 raise ValueError("Invalid loss weighting for loss_type=score_matching: {}".format(self.loss_weighting))
             # Sum over spatial dimensions and channels and mean over batch
-            # if losses.isnan().any():
-            #     print("Losses contain NaNs")
-            #     breakpoint()
             loss = torch.mean(0.5*torch.sum(losses.reshape(losses.shape[0], -1), dim=-1))
         elif self.loss_type == "denoiser":
             score = forward_out
@@ -227,13 +223,6 @@ class ScoreModel(pl.LightningModule):
             losses_l1 = (1 / target_len) * torch.abs(x_hat_td - x_td)
             losses_l1 = torch.mean(0.5*torch.sum(losses_l1.reshape(losses_l1.shape[0], -1), dim=-1))
 
-            # losses using PESQ
-#            if self.pesq_weight > 0.0:
-#                losses_pesq = self.pesq_loss(x_td, x_hat_td)
-#                losses_pesq = torch.mean(losses_pesq)
-#                # combine the losses
-#                loss = losses_tf + self.l1_weight * losses_l1 + self.pesq_weight * losses_pesq 
-#            else:
             loss = losses_tf + self.l1_weight * losses_l1
         else:
             raise ValueError("Invalid loss type: {}".format(self.loss_type))
@@ -245,19 +234,11 @@ class ScoreModel(pl.LightningModule):
 
         if self.accomp_target:
             x = y-x # make accompaniment target
-#        soundfile.write('/home/bereuter/MSS_experiments/sgmse-experiments/TEMP_OUT/train_mix'+str(np.random.randint(0,1000000))+'.wav', audio_y.cpu().squeeze().numpy().T, self.sr)
 
-#        x_init = x.clone()
-#        y_init = y.clone()
         #reshape => fuse channel and batch dimensions and unsqueeze so dimension fits for sde.marginal_prob()
-
         x = x.reshape(x.shape[0]*x.shape[1], x.shape[2], x.shape[3]).unsqueeze(1)
         y = y.reshape(y.shape[0]*y.shape[1], y.shape[2], y.shape[3]).unsqueeze(1)
         y = pad_spec(y, mode="reflection")
-                
-        # if y.isnan().any():
-        #     print("y out contain NaNs")
-        #     breakpoint()
         x = pad_spec(x, mode="reflection")
 
         t = torch.rand(x.shape[0], device=x.device) * (self.sde.T - self.t_eps) + self.t_eps
@@ -267,53 +248,30 @@ class ScoreModel(pl.LightningModule):
         x_t = mean + sigma * z
         forward_out = self(x_t, y, t)
         
-        # if forward_out.isnan().any():
-        #     print("Forward out contain NaNs")
-        #     breakpoint()
         loss = self._loss(forward_out, x_t, z, t, mean, x)
         return loss
 
     def training_step(self, batch, batch_idx):
-#        if self.temp_ct == 0:
-#            soundfile.write('/home/bereuter/MSS_experiments/sgmse-experiments/TEMP_OUT/train_mix'+str(np.random.randint(0,1000000))+'.wav', batch[-1].cpu().squeeze().numpy().T, self.sr)
-#            soundfile.write('/home/bereuter/MSS_experiments/sgmse-experiments/TEMP_OUT/train_target'+str(np.random.randint(0,1000000))+'.wav', batch[-2].cpu().squeeze().numpy().T, self.sr)
-#            self.temp_ct+=1
         loss = self._step(batch, batch_idx)
         self.log('train_loss', loss, on_step=True, on_epoch=True, sync_dist=True, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
 
-        # Evaluate speech enhancement performance
-#        self.load_from_checkpoint()
-#        self.eval()
-#        self.dnn.eval()
         rank = dist.get_rank()
         world_size = dist.get_world_size()
         if batch_idx == 0 and self.num_eval_files != 0:
-#            rank = dist.get_rank()
-#            world_size = dist.get_world_size()
-
             # Split the evaluation files among the GPUs
             eval_files_per_gpu = self.num_eval_files // world_size
-
-#            clean_files = self.data_module.valid_set.clean_files[:self.num_eval_files]
-#            noisy_files = self.data_module.valid_set.noisy_files[:self.num_eval_files]
 
             # Select the files for this GPU     
             if rank == world_size - 1:
                 first_valid_file = rank*eval_files_per_gpu
                 last_valid_file = self.num_eval_files
-#                clean_files = clean_files[rank*eval_files_per_gpu:]
-#                noisy_files = noisy_files[rank*eval_files_per_gpu:]
             else:   
                 first_valid_file = rank*eval_files_per_gpu
                 last_valid_file = (rank+1)*eval_files_per_gpu
-#                clean_files = clean_files[rank*eval_files_per_gpu:(rank+1)*eval_files_per_gpu]
-#                noisy_files = noisy_files[rank*eval_files_per_gpu:(rank+1)*eval_files_per_gpu]  
 
-#            n_files = last_valid_file - first_valid_file
-#            init_seed = torch.random.initial_seed()
             np.random.seed(2*self.data_module.rand_seed)
             rand_idx = np.arange(self.data_module.valid_set.__len__())
             np.random.shuffle(rand_idx)
@@ -321,14 +279,10 @@ class ScoreModel(pl.LightningModule):
             np.random.seed()
             # Evaluate the performance of the model
             sdr_sum = 0; si_sdr_sum = 0; multi_res_loss_sum = 0; test_sisdr = 0
-#            for (clean_file, noisy_file) in zip(clean_files, noisy_files):
-#            log_data_table = []
-#            log_data_dict = {}
             for item_id in tqdm.tqdm(rand_idx[first_valid_file:last_valid_file],desc='Validation on GPU '+str(rank)):
                 # Load the clean and noisy speech
 
                 y, x, target_rms = self.data_module.valid_set.dataset[item_id]
-#                x, sr_x = load(clean_file)
                 x = x.squeeze().numpy()
                 y = y.squeeze().numpy()
 
@@ -338,41 +292,14 @@ class ScoreModel(pl.LightningModule):
                     x = resample(x, orig_sr=self.data_module.valid_set.dataset.fs, target_sr=self.sr)
                 y = torch.from_numpy(y)
                 x = torch.from_numpy(x)
-#                y, sr_y = load(noisy_file) 
-#                assert sr_x == sr_y, "Sample rates of clean and noisy files do not match!"
 
-                # Resample if necessary
-#                if sr_x != 16000:
-#                    x_16k = resample(x, orig_sr=sr_x, target_sr=16000).squeeze()
-#                else:
-#                    x_16k = x
-
-                # Enhance the noisy speech
-#                self.eval()
-#                self.dnn.eval()
-#                torch.manual_seed(0)
-#                np.random.seed(0)
                 x_hat = self.enhance(y, N=self.sde.N)
                 x_hat = torch.from_numpy(x_hat)
-#                torch.manual_seed(0)
-#                np.random.seed(0)
-#                x_hat_2 = self.enhance(y, N=self.sde.N)
-
-#                import matplotlib.pyplot as plt
-#                plt.figure()
-#                plt.plot(x_hat[0,:])
-#                plt.plot(x_hat[0,:]-x_hat_2[0,:])
-#                plt.show()
 
                 if self.accomp_target:
                     x_hat = y-x_hat
 
 
-#                x_hat = x_hat[None,:]
-#                if self.sr != 16000:
-#                    x_hat_16k = resample(x_hat, orig_sr=self.sr, target_sr=16000).squeeze()
-#                else:
-#                    x_hat_16k = x_hat
                 if self.valid_sep_dir is not None:
                     os.makedirs(os.path.join(self.valid_sep_dir,'target'), exist_ok=True)
                     os.makedirs(os.path.join(self.valid_sep_dir,'mixture'), exist_ok=True)
@@ -383,26 +310,14 @@ class ScoreModel(pl.LightningModule):
                     soundfile.write(os.path.join(self.valid_sep_dir,'separated','separated_fileid_'+str(item_id.item())+'.wav'), x_hat.T, self.sr)
 
                 if not(self.nolog) and (self.valid_audio_log_files is not None) and (item_id in self.valid_audio_log_files) and (self.current_epoch % self.audio_log_interv)==0:
-#                    log_data_columns = ["file_id", "mixture", "target", "separated"]
-                    # log_data_table.append(["file #"+str(item_id.item()), wandb.Audio(y.T,self.sr), wandb.Audio(x.T,self.sr), wandb.Audio(x_hat.T,self.sr)])
                     log_data_dict = {}
                     if self.valid_ct==0:
                     # only log mixture and target for the first time
                         log_data_dict["file #"+str(item_id.item())] = [wandb.Audio(y.T, self.sr, caption='mixture'), wandb.Audio(x.T,self.sr,caption='target'), wandb.Audio(x_hat.T,self.sr, caption='separated')]                       
-# wandb.define_metric("file #"+str(item_id.item()),step_metric="epoch")
                     else:
-#                        log_data_dict['epoch']=self.current_epoch
                         log_data_dict["file #"+str(item_id.item())] = [wandb.Audio(x_hat.T,self.sr, caption='separated')]
                     
                     wandb.log(log_data_dict)
-#                    self.log(log_data_dict)
-                    #log_data_table.append(["file #"+str(item_id.item()), y.T, x.T, x_hat.T])
-                    # self.logger.log_table(key="samples", columns=columns, data=data, step=self.current_epoch)
-#                import matplotlib.pyplot as plt
-#                plt.figure()
-#                plt.plot(y[0,:])
-#                plt.plot(x_hat[0,:],linestyle='--')
-#                plt.show()
 
                 if x.shape[0] > 1:
                     temp_sdr = 0
@@ -419,25 +334,18 @@ class ScoreModel(pl.LightningModule):
                     test_sisdr += temp_test_sisdr.item()/x.shape[0]
                     multi_res_loss_sum += temp_multi_res.item()/x.shape[0]
                 else:
-                    sdr_sum += self.sdr(torch.from_numpy(x_hat), torch.from_numpy(x))#pesq(16000, x_16k, x_hat_16k, 'wb') 
+                    sdr_sum += self.sdr(torch.from_numpy(x_hat), torch.from_numpy(x))
                     si_sdr_sum += self.si_sdr(x_hat,x)
                     test_sisdr += si_sdr(x, x_hat)
                     multi_res_loss_sum += self.multi_res_loss(x_hat.unsqueeze(0), x.unsqueeze(0))
-#                print("stop")
-#                estoi_sum += stoi(x, x_hat, self.sr, extended=True)
+
             sdr_avg = sdr_sum / len(rand_idx[first_valid_file:last_valid_file])
             si_sdr_avg = si_sdr_sum / len(rand_idx[first_valid_file:last_valid_file])
             multi_res_loss_avg = multi_res_loss_sum / len(rand_idx[first_valid_file:last_valid_file])
             self.log('sdr', sdr_avg, on_step=False, on_epoch=True, sync_dist=True)
             self.log('si_sdr', si_sdr_avg, on_step=False, on_epoch=True, sync_dist=True)
             self.log('multi_res_loss', multi_res_loss_avg, on_step=False, on_epoch=True, sync_dist=True)
-#            if not(self.nolog) and (self.valid_audio_log_files is not None) and (self.current_epoch % self.audio_log_interv)==0:
-#                log_data_dict['sdr']=sdr_avg
-#                log_data_dict['si_sdr']=si_sdr_avg
-#                log_data_dict['multi_res_loss']=multi_res_loss_avg
-#                epoch_dict = {'epoch':self.current_epoch}
-#                epoch_dict.update(log_data_dict)
-#                wandb.log(log_data_dict)
+
         else:
             sdr_avg = None
             si_sdr_avg = None
@@ -445,7 +353,6 @@ class ScoreModel(pl.LightningModule):
 
         loss = self._step(batch, batch_idx)
         self.log('valid_loss', loss, on_step=False, on_epoch=True, sync_dist=True)
-#        self.temp_ct = 0
 
         return loss
     
@@ -621,11 +528,9 @@ class ScoreModel(pl.LightningModule):
         One-call speech enhancement of noisy speech `y`, for convenience.
         """
         start = time.time()
-#        Y = y
         T_orig = y.size(1) 
         norm_factor = y.abs().max()#.item()
         y = y / norm_factor
-#        Y = torch.unsqueeze(self._forward_transform(self._stft(y.cuda())), 0)
         if y.shape[0]>1:
             Y = torch.unsqueeze(self._forward_transform(self._stft(y.cuda())), 1)
         else:

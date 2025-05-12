@@ -4,9 +4,6 @@ import numpy as np
 import scipy.stats
 from scipy.signal import butter, sosfilt
 
-#from pesq import pesq
-#from pystoi import stoi
-
 
 def si_sdr_components(s_hat, s, n):
     # s_target

@@ -3,7 +3,7 @@ import abc
 import torch
 import numpy as np
 
-from sgmse.util.registry import Registry
+from sgmsvs.sgmse.util.registry import Registry
 
 
 PredictorRegistry = Registry("Predictor")

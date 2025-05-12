@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Training parameters for HTDemucs
+# Bash script to start trianing of HTDemucs
 # --base_idr: Base directory where moisesdb and musdb18hq are located
 # --ckpt: uncomment this to resume training from a checkpoint
-python train_baseline.py \
+# --nolog: comment this to enable logging
+python ./00_training_and_inference/train_baseline.py \
     --base_dir "/media/DATA/shared/datasets/MSS_datasets" \
     --format "MSS" \
     --samples_per_track "24" \

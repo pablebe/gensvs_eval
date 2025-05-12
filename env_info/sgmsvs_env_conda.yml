@@ -1,0 +1,9 @@
+name: gensvs_eval_sgmsvs_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11.8=hab00c5b_0_cpython
+variables:
+  CUDA_HOME: <path to where conda environments are located>/envs/gensvs_eval_sgmsvs_env
+

@@ -4,10 +4,6 @@ import numpy as np
 import scipy.stats
 from scipy.signal import butter, sosfilt
 
-#from pesq import pesq
-#from pystoi import stoi
-
-
 def si_sdr_components(s_hat, s, n):
     # s_target
     alpha_s = np.dot(s_hat, s) / np.linalg.norm(s)**2

@@ -5,18 +5,6 @@ import sys
 import torch.nn as nn
 
 
-# def get_model_from_config(model_type, config):
-#     if model_type == 'mel_band_roformer':
-#         from models.mel_band_roformer import MelBandRoformer
-#         model = MelBandRoformer(
-#             **dict(config.model)
-#         )
-#     else:
-#         print('Unknown model: {}'.format(model_type))
-#         model = None
-#
-#    return model
-
 
 def get_windowing_array(window_size, fade_size, device):
     fadein = torch.linspace(0, 1, fade_size)
