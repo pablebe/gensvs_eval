@@ -269,48 +269,21 @@ class MSSSpecs(Dataset):
         self.dataset_str = dataset_str
 
     def __getitem__(self, i):
-#        x, _ = load(self.clean_files[i])
-#        y, _ = load(self.noisy_files[i])
 
-        # return torch.Tensor(mixture), torch.Tensor(target_bass), torch.Tensor(target_vocals), torch.Tensor(target_other), torch.Tensor(target_drums), vocal_rms#, mixture_filepath#, mixture_start_index#x, y_bass, y_vocals, y_other, y_drums
         y, x, target_rms = self.dataset[i]
 
-#        if self.subset == "train":
-        if False:
-            import soundfile
-            soundfile.write('/home/bereuter/MSS_experiments/sgmse-experiments/TEMP_OUT/mix.wav',y.T, 44100)
-            soundfile.write('/home/bereuter/MSS_experiments/sgmse-experiments/TEMP_OUT/target.wav',x.T, 44100)
-#            soundfile.write('/home/bereuter/MSS_experiments/sgmse-experiments/TEMP_OUT/other.wav',target_other.T, 44100)
-#            soundfile.write('/home/bereuter/MSS_experiments/sgmse-experiments/TEMP_OUT/drums.wav',target_drums.T, 44100)
-#            soundfile.write('/home/bereuter/MSS_experiments/sgmse-experiments/TEMP_OUT/vocals.wav',target_vocals.T, 44100)
 
         # formula applies for center=True
         target_len = (self.num_frames ) * self.hop_length
         current_len = x.size(-1)
         pad = max(target_len - current_len, 0)
         if pad != 0:
-        #     # extract random part of the audio file
-        #     if self.shuffle_spec:
-        #         start = int(np.random.uniform(0, current_len-target_len))
-        #     else:
-        #         start = int((current_len-target_len)/2)
-        #     x = x[..., start:start+target_len]
-        #     y = y[..., start:start+target_len]
-        # else:
+
             # pad audio if the length T is smaller than num_frames
             x = F.pad(x, (pad//2, pad//2+(pad%2)), mode='constant')
             if self.pad_mix:
                 y = F.pad(y, (pad//2, pad//2+(pad%2)), mode='constant')
 
-        x_init = x.clone()
-        y_init = y.clone()  
-        if x.isnan().any():
-            print("x contain NaNs")
-            breakpoint()
-        
-        if y.isnan().any():
-            print("y contain NaNs")
-            breakpoint()
 
         # normalize w.r.t to the noisy or the clean signal or not at all
         # to ensure same clean signal power in x and y.
