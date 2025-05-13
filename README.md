@@ -5,32 +5,32 @@ This repository accompanies the submission titled "Towards Reliable Objective Ev
 To run all of the code in this repository we recommend setting up the following conda environments, neccesary to infer or train the models mentioned in the paper.
 
 ### Conda environment for training and inference of **HTDemucs** and **Mel-RoFo. (S)** (```gensvs_eval_baseline_env```):
-> 1. Create the conda environment:  
+1. Create the conda environment:  
 ```$ conda env create -f ./env_info/mss_baseline_env_conda.yml```  
-> 2. Install additional python dependencies:  
+2. Install additional python dependencies:  
 ```$ pip install -r ./env_info/mss_baseline_env_requirements.txt```
 
 ### Conda environment for training and inference of **SGMSVS** model (```gensvs_eval_sgmsvs_env```):
-> 1. Set the ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where the CUDA toolkit is installed. This can be the path where conda environment will be located
-> 2. Create the conda environment:   
+1. Set the ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where the CUDA toolkit is installed. This can be the path where conda environment will be located
+2. Create the conda environment:   
 ```$ conda env create -f ./env_info/sgmsvs_env_conda.yml```
-> 3. Install additional python dependencies:  
+3. Install additional python dependencies:  
 ```$ pip install -r ./env_info/sgmsvs_env.txt```
 
 ### Conda environment for training/finetuning and inference of **Mel-RoFo. (S)+BigVGAN** (```gensvs_eval_bigvgan_env```):
-> 1. Set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
-> 2. Create the conda environment:  
+1. Set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
+2. Create the conda environment:  
 ```$ conda env create -f ./env_info/bigvgan_env.yml```
-> 3. Install additional python dependencies:  
+3. Install additional python dependencies:  
 ```$ pip install -r ./env_info/bigvgan_env_requirements.txt```
 
 ### Conda environment for evaluation of FAD and MSE metrics (```gensvs_fad_mse_eval_env```):
 For evaluating the model's performance using the proposed FAD and MSE evaluation metrics an additional conda environment has to be set up. This conda envirnonment builds on Microsoft's Frechet Audio Distance Toolkit [5].
-> 1. Create the conda environment:
+1. Create the conda environment:
 ```$ conda env create -f ./env_info/svs_fad_mse_eval_env.yml``` 
-> 2. Install additional python dependencies:
+2. Install additional python dependencies:
 ```$ pip install -r ./env_info/svs_fad_mse_eval_env.txt```  
-> 3. Test fadtk installation with: ```python -m fadtk.test```
+3. Test fadtk installation with: ```$ python -m fadtk.test```
 
 ### Conda environment for evaluation of other metrics and correlation analysis (```gensvs_eval_env```)
 For evaluating the model's performance using the objective evaluation metrics and reproduce the correlation analysis of the paper we recommend setting up an additional conda environment with:
