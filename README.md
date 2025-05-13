@@ -25,14 +25,12 @@ To run all of the code in this repository we recommend setting up the following 
 ```$ pip install -r ./env_info/bigvgan_env_requirements.txt```
 
 ### Conda environment for evaluation of FAD and MSE metrics (```gensvs_fad_mse_eval_env```):
-For evaluating the model's performance using the proposed FAD and MSE evaluation metrics an additional conda environment has to be set up:
+For evaluating the model's performance using the proposed FAD and MSE evaluation metrics an additional conda environment has to be set up. This conda envirnonment builds on Microsoft's Frechet Audio Distance Toolkit [5].
 > 1. Create the conda environment:
-```$ ``` 
-
+```$ conda env create -f ./env_info/svs_fad_mse_eval_env.yml``` 
 > 2. Install additional python dependencies:
-```$```  
-> 4. Test fadtk installation with: ```python -m fadtk.test```
-> 3. Note fadtk MERT change in Hubert Loader of xformers.
+```$ pip install -r ./env_info/svs_fad_mse_eval_env.txt```  
+> 3. Test fadtk installation with: ```python -m fadtk.test```
 
 ### Conda environment for evaluation of other metrics and correlation analysis (```gensvs_eval_env```)
 For evaluating the model's performance using the objective evaluation metrics and reproduce the correlation analysis of the paper we recommend setting up an additional conda environment with:
@@ -123,7 +121,8 @@ These references pertain only to the code reused to set up this codebase. For mo
 >[3] Kimberley Jensen, "Mel-Band-Roformer-Vocal-Model", 2024, Git Repository:<url>https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model</url>
 >
 >[4] Sang-gil Lee, Wei Ping, Boris Ginsburg, Bryan Catanzaro, Sungroh Yoon, "Big{VGAN}: A Universal Neural Vocoder with Large-Scale Training", in Proc. ICLR, 2023, Git Repository: <url>https://github.com/NVIDIA/BigVGAN</url>
-
+>
+>[5] Azalea Gui, Hannes Gamper, Sebastian Braun, Dimitra Emmanouilidou, "Adapting Frechet Audio Distance for Generative Music Evaluation", in Proc. ICASSP, 2024, Git Repository: <url>https://github.com/microsoft/fadtk</url>
 ```bib
 @article{richter2023speech,
          title={Speech Enhancement and Dereverberation with Diffusion-based Generative Models},
@@ -166,6 +165,14 @@ These references pertain only to the code reused to set up this codebase. For mo
                url={https://openreview.net/forum?id=iTtGCMDEzS_}
               }
 ```
-
+```bib
+@inproceedings{fadtk,
+               title = {Adapting Frechet Audio Distance for Generative Music Evaluation},
+               author = {Azalea Gui, Hannes Gamper, Sebastian Braun, Dimitra Emmanouilidou},
+               booktitle = {Proc. IEEE ICASSP 2024},
+               year = {2024},
+               url = {https://arxiv.org/abs/2311.01616},
+              }
+```
 ## Cite This Work:
 Citation if paper is accepted will be added here!

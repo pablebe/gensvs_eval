@@ -34,7 +34,7 @@ os.makedirs(MatDestDir, exist_ok=True)
 audiobox_predictor = initialize_predictor()
 
 
-CALCULATE_BSS_EVAL = False#True
+CALCULATE_BSS_EVAL = False
 CALCULATE_PEASS = False
 CALCULATE_BSS_EVAL_W_PEASS = False 
 CALCULATE_SINGMOS_XLS_R = False
