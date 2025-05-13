@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.10.16=he870216_1
+  - python=3.10.16
 variables:
   CUDA_HOME: <!!add-path-to-conda-environments-here!!>/gensvs_eval_bigvgan_env
 

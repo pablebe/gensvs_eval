@@ -6,14 +6,9 @@
 import torch
 import numpy as np
 import soundfile
-import subprocess
 import tqdm
 import os
 import fast_bss_eval
-import mir_eval
-import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 18})
-import scipy
 import matlab.engine
 import pandas as pd
 from glob import glob
@@ -21,7 +16,6 @@ from torchmetrics.audio.sdr import scale_invariant_signal_distortion_ratio, sign
 from auraloss.freq import MultiResolutionSTFTLoss
 from argparse import ArgumentParser
 from librosa import resample
-from helper_functions import frame_and_win
 
 from visqol import visqol_lib_py
 from visqol.pb2 import visqol_config_pb2
@@ -39,10 +33,6 @@ os.makedirs(MatDestDir, exist_ok=True)
 
 audiobox_predictor = initialize_predictor()
 
-VAD_WLEN = 64e-3#s
-rms_threshold = 0.1
-apply_rms_mask = False
-mean_channel_dim = True
 
 CALCULATE_BSS_EVAL = False#True
 CALCULATE_PEASS = False
@@ -285,34 +275,6 @@ if __name__ == '__main__':
         target = target.T
 
         target_48k = resample(target, orig_sr=sr_target, target_sr=48e3)
-        frame_length = int(VAD_WLEN*args.sr)
-        hop_length = frame_length
-        n_frames = int(np.ceil(target.shape[1]/hop_length))
-        target_win = frame_and_win(target, hop_length=hop_length, frame_length=frame_length, win=np.sqrt(np.hanning(frame_length)), n_frames=n_frames)
-        target_rms = np.sqrt(np.mean(target_win**2, axis=-2))
-        rms_max = np.max(target_rms,axis=-1)[:,None]
-        target_rms_relative = target_rms/rms_max
-        t_start=0
-        t_end=target.shape[1]/args.sr
-        tax_1 = np.linspace(t_start, t_end, target.shape[1])
-        tax_2 = np.linspace(t_start, t_end, target_win.shape[2])
-
-        spline_interp_ch1 = scipy.interpolate.CubicSpline(tax_2, target_rms_relative[0,:])
-        if two_ch_flag:
-            spline_interp_ch2 = scipy.interpolate.CubicSpline(tax_2, target_rms_relative[1,:])
-        rms_rel_interp_ch1 = spline_interp_ch1(tax_1)
-        if two_ch_flag:
-            rms_rel_interp_ch2 = spline_interp_ch2(tax_1)
-            target_rms_rel_interp = np.stack([rms_rel_interp_ch1, rms_rel_interp_ch2], axis=0)
-        else:
-            target_rms_rel_interp = rms_rel_interp_ch1[None,:]
-            
-        target_rms_rel_interp[target_rms_rel_interp<rms_threshold] = np.nan
-        target_rms_mask = ~np.isnan(target_rms_rel_interp)
-        target_rms_mask = target_rms_mask[0,:]
-        
-        target_rms_mask_48k = resample(target_rms_mask.astype('float32')[None,:], orig_sr=args.sr, target_sr=48e3)
-        target_rms_mask_48k = target_rms_mask_48k[0,:]>0.5
 
         sep_sgmsvs_scratch, sr_sgmsvs_scratch = soundfile.read(sep_file_sgmsvs_from_scratch)
         if not(two_ch_flag):
@@ -357,62 +319,22 @@ if __name__ == '__main__':
         soundfile.write(interference_file, interference.T, args.sr)
         
        
-        if apply_rms_mask:
-            mixture = np.stack((mixture[0,target_rms_mask], mixture[1,target_rms_mask]), axis=0)
-            target = np.stack((target[0,target_rms_mask], target[1,target_rms_mask]), axis=0)
-            mixture_48k = np.stack((mixture_48k[0,target_rms_mask_48k], mixture_48k[1,target_rms_mask_48k]), axis=0)
-            target_48k = np.stack((target_48k[0,target_rms_mask_48k], target_48k[1,target_rms_mask_48k]), axis=0)
-            mixture = torch.from_numpy(mixture)
-            target = torch.from_numpy(target)
-            mixture_48k = torch.from_numpy(mixture_48k)
-            target_48k = torch.from_numpy(target_48k)
-            
-            
-            sep_sgmsvs_scratch = np.stack((sep_sgmsvs_scratch[0,target_rms_mask], sep_sgmsvs_scratch[1,target_rms_mask]), axis=0)
-            sep_sgmsvs_scratch = torch.from_numpy(sep_sgmsvs_scratch)
-            
-            sep_sgmsvs_scratch_48k = np.stack((sep_sgmsvs_scratch_48k[0,target_rms_mask_48k], sep_sgmsvs_scratch_48k[1,target_rms_mask_48k]), axis=0)
-            sep_sgmsvs_scratch_48k = torch.from_numpy(sep_sgmsvs_scratch_48k)
-            
-            sep_melroform_bigvgan = np.stack((sep_melroform_bigvgan[0,target_rms_mask], sep_melroform_bigvgan[1,target_rms_mask]), axis=0)
-            sep_melroform_bigvgan = torch.from_numpy(sep_melroform_bigvgan)
-            sep_melroform_bigvgan_48k = np.stack((sep_melroform_bigvgan_48k[0,target_rms_mask_48k], sep_melroform_bigvgan_48k[1,target_rms_mask_48k]), axis=0)
-            
-            sep_melroform_small = np.stack((sep_melroform_small[0,target_rms_mask], sep_melroform_small[1,target_rms_mask]), axis=0)
-            sep_melroform_small = torch.from_numpy(sep_melroform_small)
-            
-            sep_melroform_small_48k = np.stack((sep_melroform_small_48k[0,target_rms_mask_48k], sep_melroform_small_48k[1,target_rms_mask_48k]), axis=0)
-            sep_melroform_small_48k = torch.from_numpy(sep_melroform_small_48k)
-            
-            sep_melroform_large = np.stack((sep_melroform_large[0,target_rms_mask], sep_melroform_large[1,target_rms_mask]), axis=0)
-            sep_melroform_large = torch.from_numpy(sep_melroform_large)
-            
-            sep_melroform_large_48k = np.stack((sep_melroform_large_48k[0,target_rms_mask_48k], sep_melroform_large_48k[1,target_rms_mask_48k]), axis=0)
-            sep_melroform_large_48k = torch.from_numpy(sep_melroform_large_48k)
-            
-            sep_htdemucs = np.stack((sep_htdemucs[0,target_rms_mask], sep_htdemucs[1,target_rms_mask]), axis=0)
-            sep_htdemucs = torch.from_numpy(sep_htdemucs)
-            
-            sep_htdemucs_48k = np.stack((sep_htdemucs_48k[0,target_rms_mask_48k], sep_htdemucs_48k[1,target_rms_mask_48k]), axis=0)
-            sep_htdemucs_48k = torch.from_numpy(sep_htdemucs_48k)
-            
 
-        else:
-            mixture = torch.from_numpy(mixture)
-            target = torch.from_numpy(target)
-            sep_sgmsvs_scratch = torch.from_numpy(sep_sgmsvs_scratch)
-            sep_melroform_bigvgan = torch.from_numpy(sep_melroform_bigvgan)
-            sep_melroform_small = torch.from_numpy(sep_melroform_small)
-            sep_melroform_large = torch.from_numpy(sep_melroform_large)
-            sep_htdemucs = torch.from_numpy(sep_htdemucs)
-            
-            mixture_48k = torch.from_numpy(mixture_48k)
-            target_48k = torch.from_numpy(target_48k)
-            sep_sgmsvs_scratch_48k = torch.from_numpy(sep_sgmsvs_scratch_48k)
-            sep_melroform_bigvgan_48k = torch.from_numpy(sep_melroform_bigvgan_48k)
-            sep_melroform_small_48k = torch.from_numpy(sep_melroform_small_48k)
-            sep_melroform_large_48k = torch.from_numpy(sep_melroform_large_48k)
-            sep_htdemucs_48k = torch.from_numpy(sep_htdemucs_48k)
+        mixture = torch.from_numpy(mixture)
+        target = torch.from_numpy(target)
+        sep_sgmsvs_scratch = torch.from_numpy(sep_sgmsvs_scratch)
+        sep_melroform_bigvgan = torch.from_numpy(sep_melroform_bigvgan)
+        sep_melroform_small = torch.from_numpy(sep_melroform_small)
+        sep_melroform_large = torch.from_numpy(sep_melroform_large)
+        sep_htdemucs = torch.from_numpy(sep_htdemucs)
+        
+        mixture_48k = torch.from_numpy(mixture_48k)
+        target_48k = torch.from_numpy(target_48k)
+        sep_sgmsvs_scratch_48k = torch.from_numpy(sep_sgmsvs_scratch_48k)
+        sep_melroform_bigvgan_48k = torch.from_numpy(sep_melroform_bigvgan_48k)
+        sep_melroform_small_48k = torch.from_numpy(sep_melroform_small_48k)
+        sep_melroform_large_48k = torch.from_numpy(sep_melroform_large_48k)
+        sep_htdemucs_48k = torch.from_numpy(sep_htdemucs_48k)
 
             
         if CALCULATE_BSS_EVAL:
@@ -473,7 +395,6 @@ if __name__ == '__main__':
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":mixture.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_noisy.append(ab_aes[0]['PQ'])
-            meta_aes_ce_scores_noisy.append(ab_aes[0]['CE'])
             meta_aes_cu_scores_noisy.append(ab_aes[0]['CU'])
 
 
@@ -534,7 +455,6 @@ if __name__ == '__main__':
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_sgmsvs_scratch.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_sgmsvs_scratch.append(ab_aes[0]['PQ'])
-            meta_aes_ce_scores_sgmsvs_scratch.append(ab_aes[0]['CE'])
             meta_aes_cu_scores_sgmsvs_scratch.append(ab_aes[0]['CU'])
                        
             
@@ -615,7 +535,6 @@ if __name__ == '__main__':
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_melroform_bigvgan.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_melroform_bigvgan.append(ab_aes[0]['PQ'])
-            meta_aes_ce_scores_melroform_bigvgan.append(ab_aes[0]['CE'])
             meta_aes_cu_scores_melroform_bigvgan.append(ab_aes[0]['CU'])
             
 
@@ -675,7 +594,6 @@ if __name__ == '__main__':
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_melroform_small.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_melroform_small.append(ab_aes[0]['PQ'])
-            meta_aes_ce_scores_melroform_small.append(ab_aes[0]['CE'])
             meta_aes_cu_scores_melroform_small.append(ab_aes[0]['CU'])
             
            
@@ -736,7 +654,6 @@ if __name__ == '__main__':
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_melroform_large.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_melroform_large.append(ab_aes[0]['PQ'])
-            meta_aes_ce_scores_melroform_large.append(ab_aes[0]['CE'])
             meta_aes_cu_scores_melroform_large.append(ab_aes[0]['CU'])
 
         if CALCULATE_BSS_EVAL:
@@ -796,7 +713,6 @@ if __name__ == '__main__':
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_htdemucs.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_htdemucs.append(ab_aes[0]['PQ'])
-            meta_aes_ce_scores_htdemucs.append(ab_aes[0]['CE'])
             meta_aes_cu_scores_htdemucs.append(ab_aes[0]['CU'])
             
 
@@ -812,7 +728,6 @@ if __name__ == '__main__':
     singmos_scores_noisy = np.array(singmos_scores_noisy)
     visqol_scores_noisy = np.array(visqol_scores_noisy)
     meta_aes_pq_scores_noisy = np.array(meta_aes_pq_scores_noisy)
-    meta_aes_ce_scores_noisy = np.array(meta_aes_ce_scores_noisy)
     meta_aes_cu_scores_noisy = np.array(meta_aes_cu_scores_noisy)
     xls_r_sqa_scores_noisy = np.array(xls_r_sqa_scores_noisy)
 
@@ -828,7 +743,6 @@ if __name__ == '__main__':
     singmos_scores_sgmsvs_scratch = np.array(singmos_scores_sgmsvs_scratch)
     visqol_scores_sgmsvs_scratch = np.array(visqol_scores_sgmsvs_scratch)
     meta_aes_pq_scores_sgmsvs_scratch = np.array(meta_aes_pq_scores_sgmsvs_scratch)
-    meta_aes_ce_scores_sgmsvs_scratch = np.array(meta_aes_ce_scores_sgmsvs_scratch)
     meta_aes_cu_scores_sgmsvs_scratch = np.array(meta_aes_cu_scores_sgmsvs_scratch)
     xls_r_sqa_scores_sgmsvs_scratch = np.array(xls_r_sqa_scores_sgmsvs_scratch)
     
@@ -844,7 +758,6 @@ if __name__ == '__main__':
     singmos_scores_melroform_bigvgan = np.array(singmos_scores_melroform_bigvgan)
     visqol_scores_melroform_bigvgan = np.array(visqol_scores_melroform_bigvgan)
     meta_aes_pq_scores_melroform_bigvgan = np.array(meta_aes_pq_scores_melroform_bigvgan)
-    meta_aes_ce_scores_melroform_bigvgan = np.array(meta_aes_ce_scores_melroform_bigvgan)
     meta_aes_cu_scores_melroform_bigvgan = np.array(meta_aes_cu_scores_melroform_bigvgan)
     xls_r_sqa_scores_melroform_bigvgan = np.array(xls_r_sqa_scores_melroform_bigvgan)
 
@@ -860,7 +773,6 @@ if __name__ == '__main__':
     singmos_scores_melroform_small = np.array(singmos_scores_melroform_small)
     visqol_scores_melroform_small = np.array(visqol_scores_melroform_small)
     meta_aes_pq_scores_melroform_small = np.array(meta_aes_pq_scores_melroform_small)
-    meta_aes_ce_scores_melroform_small = np.array(meta_aes_ce_scores_melroform_small)
     meta_aes_cu_scores_melroform_small = np.array(meta_aes_cu_scores_melroform_small)
     xls_r_sqa_scores_melroform_small = np.array(xls_r_sqa_scores_melroform_small)
 
@@ -877,7 +789,6 @@ if __name__ == '__main__':
     singmos_scores_melroform_large = np.array(singmos_scores_melroform_large)
     visqol_scores_melroform_large = np.array(visqol_scores_melroform_large)
     meta_aes_pq_scores_melroform_large = np.array(meta_aes_pq_scores_melroform_large)
-    meta_aes_ce_scores_melroform_large = np.array(meta_aes_ce_scores_melroform_large)
     meta_aes_cu_scores_melroform_large = np.array(meta_aes_cu_scores_melroform_large)
     xls_r_sqa_scores_melroform_large = np.array(xls_r_sqa_scores_melroform_large)
 
@@ -894,7 +805,6 @@ if __name__ == '__main__':
     singmos_scores_htdemucs = np.array(singmos_scores_htdemucs)
     visqol_scores_htdemucs = np.array(visqol_scores_htdemucs)
     meta_aes_pq_scores_htdemucs = np.array(meta_aes_pq_scores_htdemucs)
-    meta_aes_ce_scores_htdemucs = np.array(meta_aes_ce_scores_htdemucs)
     meta_aes_cu_scores_htdemucs = np.array(meta_aes_cu_scores_htdemucs)
 
     xls_r_sqa_scores_htdemucs = np.array(xls_r_sqa_scores_htdemucs)
@@ -1028,11 +938,9 @@ if __name__ == '__main__':
         
     if CALCULATE_AUDIOBOX:
         audiobox_data_pq = np.stack((meta_aes_pq_scores_noisy, meta_aes_pq_scores_sgmsvs_scratch, meta_aes_pq_scores_melroform_bigvgan, meta_aes_pq_scores_melroform_small, meta_aes_pq_scores_melroform_large, meta_aes_pq_scores_htdemucs), axis=1)
-        audiobox_data_ce = np.stack((meta_aes_ce_scores_noisy, meta_aes_ce_scores_sgmsvs_scratch, meta_aes_ce_scores_melroform_bigvgan, meta_aes_ce_scores_melroform_small, meta_aes_ce_scores_melroform_large, meta_aes_ce_scores_htdemucs), axis=1)
         audiobox_data_cu = np.stack((meta_aes_cu_scores_noisy, meta_aes_cu_scores_sgmsvs_scratch, meta_aes_cu_scores_melroform_bigvgan, meta_aes_cu_scores_melroform_small, meta_aes_cu_scores_melroform_large, meta_aes_cu_scores_htdemucs), axis=1)
         
         pd_audiobox_pq = pd.DataFrame(audiobox_data_pq, columns=row_names)
-        pd_audiobox_ce = pd.DataFrame(audiobox_data_ce, columns=row_names)
         pd_audiobox_cu = pd.DataFrame(audiobox_data_cu, columns=row_names)
 
         #concatenate file_order df
@@ -1042,6 +950,5 @@ if __name__ == '__main__':
         
         
         pd_audiobox_pq.to_csv(os.path.join(output_path, 'meta_audiobox_aes_PQ.csv'))
-        pd_audiobox_ce.to_csv(os.path.join(output_path, 'meta_audiobox_aes_CE.csv'))
         pd_audiobox_cu.to_csv(os.path.join(output_path, 'meta_audiobox_aes_CU.csv'))
         

@@ -2,3 +2,6 @@
 .vscode/launch.json
 00_training_and_inference/lightning_logs
 trained_models
+01_evaluation_and_correlation/evaluation_audio
+01_evaluation_and_correlation/evaluation_metrics_new
+01_evaluation_and_correlation/fadtk_mod/.model-checkpoints
