@@ -34,10 +34,10 @@ For evaluating the model's performance using the proposed FAD and MSE evaluation
 
 ### Conda environment for evaluation of other metrics and correlation analysis (```gensvs_eval_env```)
 For evaluating the model's performance using the objective evaluation metrics and reproduce the correlation analysis of the paper we recommend setting up an additional conda environment with:
-> 1. Create the conda environment:
+1. Create the conda environment:
 ```$ ``` 
 
-> 2. Install additional python dependencies:
+2. Install additional python dependencies:
 ```$ ```
 
 In addition to the dependencies the ViSQOL Python API and a running Matlab installation is required.
