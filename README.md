@@ -30,7 +30,8 @@ For evaluating the model's performance using the objective evaluation metrics an
 ```$ ``` 
 
 > 2. Install additional python dependencies:
-```$``` 
+```$```
+In addition to the dependencies the ViSQOL Python API () and a running Matlab installation is required. 
 
 ## 🏋🏽‍♀️🏃🏽‍♀️‍➡️ Training and Inference
 The folder ```00_training_and_inference``` contains all code required to carry out training and inference for all the models mentioned in the paper. 
@@ -47,9 +48,9 @@ To run the mask-based baseline models on a folder of musical mixtures the follow
   - HTDemucs & Mel-RoFo. (S): ```00_training_and_inference/inference_baseline.py```  
   - Mel-RoFo. (L): ```00_training_and_inference/inference_melroformer_large.py```  
 - Bash:
-  - HTDemucs: ```00_training_and_inference/infer_htdemucs.sh```
-  - Mel-RoFo. (S):```00_training_and_inference/infer_melroformer_small.sh``` 
-  - Mel-RoFo. (L): ```00_training_and_inference/infer_melroformer_large.sh```
+  - HTDemucs: ```$ 00_training_and_inference/infer_htdemucs.sh```
+  - Mel-RoFo. (S):```$ 00_training_and_inference/infer_melroformer_small.sh``` 
+  - Mel-RoFo. (L): ```$ 00_training_and_inference/infer_melroformer_large.sh```
 
 #### Generative models: SGMSVS & Mel-RoFo. (S) + BigVGAN
 To run the generative models on a folder of musical mixtures the following scripts can be used:  
@@ -57,7 +58,7 @@ To run the generative models on a folder of musical mixtures the following scrip
   - SGMSVS: ```00_training_and_inference/inference_sgmsvs.py```
   - Mel-RoFo. (S) + BigVGAN: ```00_training_and_inference/inference_melroformer_small_bigvgan.py```
 - Bash:
-  - SGMSVS: ```00_training_and_inference/infer_sgmsvs.sh```
+  - SGMSVS: ```$ 00_training_and_inference/infer_sgmsvs.sh```
   - Mel-RoFo. (S) + BigVGAN: ```00_training_and_inference/infer_melroformer_small_bigvgan.sh```
 ### Training
 Below the python training scripts and example bash scripts are listed for all models to reproduce all trainings and the set parameters mentioned in the paper:
@@ -65,17 +66,17 @@ Below the python training scripts and example bash scripts are listed for all mo
 To train the dicriminative mask-based baselines use:
   - Python: ```00_training_and_inference/train_baseline.py```
   - Bash: 
-    - ```00_training_and_inference/train_htdemucs.sh```
-    - ```00_training_and_inference/train_melroformer.sh```
+    - ```$ 00_training_and_inference/train_htdemucs.sh```
+    - ```$ 00_training_and_inference/train_melroformer.sh```
 #### Score-based generative model: SGMSVS
 To train the SGMSVS model, use the scripts:
 - Python: ```00_training_and_inference/train_sgmsvs.py```
-- Bash: ```00_training_and_inference/train_sgmsvs.sh```
+- Bash: ```$ 00_training_and_inference/train_sgmsvs.sh```
 
 #### GAN-based model: Mel-RoFo. (S) + BigVGAN
 To task-specifically finetune BigVGAN for singing voice separation with Mel-RoFo. (S) you can use:
 - Python: ```00_training_and_inference/train_finetune_bigvgan.py```
-- Bash: ```00_training_and_inference/train_bigvgan.sh```
+- Bash: ```$ 00_training_and_inference/train_bigvgan.sh```
 
 ## 🧮 Evaluation and Correlation Analysis
 01_evaluation_and_correlation contains the code to compute all objective evaluation metrics and all *.csv files of the evaluated objective audio quality metrics.

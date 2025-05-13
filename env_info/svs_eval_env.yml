@@ -1,0 +1,7 @@
+name: gensvs_eval_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11.8=hab00c5b_0_cpython
+
