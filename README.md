@@ -31,7 +31,7 @@ For evaluating the model's performance using the objective evaluation metrics an
 
 > 2. Install additional python dependencies:
 ```$```
-In addition to the dependencies the ViSQOL Python API () and a running Matlab installation is required. 
+In addition to the dependencies the ViSQOL Python API () and a running Matlab installation is required.
 
 ## 🏋🏽‍♀️🏃🏽‍♀️‍➡️ Training and Inference
 The folder ```00_training_and_inference``` contains all code required to carry out training and inference for all the models mentioned in the paper. 
