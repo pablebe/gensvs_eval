@@ -5,3 +5,6 @@ trained_models
 01_evaluation_and_correlation/evaluation_audio
 01_evaluation_and_correlation/evaluation_metrics_new
 01_evaluation_and_correlation/fadtk_mod/.model-checkpoints
+visqol-master
+
+checkpoints/

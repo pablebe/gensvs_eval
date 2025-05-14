@@ -2,29 +2,30 @@
 This repository accompanies the submission titled "Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation".
 
 ## 🚀 Getting Started
-To run all of the code in this repository we recommend setting up the following conda environments, neccesary to infer or train the models mentioned in the paper.
+To run all of the code in this repository we recommend setting up the following 5 conda environments.  
+Environments I-III are necessary to infer and train all models mentioned in the paper and environments IV-V are necessary to reproduce the evaluation and correlation analysis outlined in the paper. 
 
-### Conda environment for training and inference of **HTDemucs** and **Mel-RoFo. (S)** (```gensvs_eval_baseline_env```):
+### I. Conda environment for training and inference of **HTDemucs** and **Mel-RoFo. (S)** (```gensvs_eval_baseline_env```):
 1. Create the conda environment:  
 ```$ conda env create -f ./env_info/mss_baseline_env_conda.yml```  
 2. Install additional python dependencies:  
 ```$ pip install -r ./env_info/mss_baseline_env_requirements.txt```
 
-### Conda environment for training and inference of **SGMSVS** model (```gensvs_eval_sgmsvs_env```):
+### II. Conda environment for training and inference of **SGMSVS** model (```gensvs_eval_sgmsvs_env```):
 1. Set the ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where the CUDA toolkit is installed. This can be the path where conda environment will be located
 2. Create the conda environment:   
 ```$ conda env create -f ./env_info/sgmsvs_env_conda.yml```
 3. Install additional python dependencies:  
 ```$ pip install -r ./env_info/sgmsvs_env.txt```
 
-### Conda environment for training/finetuning and inference of **Mel-RoFo. (S)+BigVGAN** (```gensvs_eval_bigvgan_env```):
+### IIII. Conda environment for training/finetuning and inference of **Mel-RoFo. (S)+BigVGAN** (```gensvs_eval_bigvgan_env```):
 1. Set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
 2. Create the conda environment:  
 ```$ conda env create -f ./env_info/bigvgan_env.yml```
 3. Install additional python dependencies:  
 ```$ pip install -r ./env_info/bigvgan_env_requirements.txt```
 
-### Conda environment for evaluation of FAD and MSE metrics (```gensvs_fad_mse_eval_env```):
+### IV. Conda environment for evaluation of FAD and MSE metrics (```gensvs_fad_mse_eval_env```):
 For evaluating the model's performance using the proposed FAD and MSE evaluation metrics an additional conda environment has to be set up. This conda envirnonment builds on Microsoft's Frechet Audio Distance Toolkit [5].
 1. Create the conda environment:
 ```$ conda env create -f ./env_info/svs_fad_mse_eval_env.yml``` 
@@ -32,15 +33,18 @@ For evaluating the model's performance using the proposed FAD and MSE evaluation
 ```$ pip install -r ./env_info/svs_fad_mse_eval_env.txt```  
 3. Test fadtk installation with: ```$ python -m fadtk.test```
 
-### Conda environment for evaluation of other metrics and correlation analysis (```gensvs_eval_env```)
+### V. Conda environment for evaluation of other metrics and correlation analysis (```gensvs_eval_env```)
 For evaluating the model's performance using the objective evaluation metrics and reproduce the correlation analysis of the paper we recommend setting up an additional conda environment with:
-1. Create the conda environment:
-```$ ``` 
+1. Create the conda environment:  
+```$ ./env_info/svs_eval_env.yml``` 
 
-2. Install additional python dependencies:
-```$ ```
+2. Install additional python dependencies:  
+```$ ./env_info/svs_eval_env.txt```
+3. Build the ViSQOL API according to instructions of https://github.com/google/visqol and place within folder within root directory
+   - **Note:** URL and SHA256 of Armadillo headers in WORKSPACE file need to be changed to a recent version (https://sourceforge.net/projects/arma/files/)
 
-In addition to the dependencies the ViSQOL Python API and a running Matlab installation is required.
+
+In addition to the dependencies the ViSQOL API (run through command line) and a running Matlab (version<2025a) installation is required.
 ## 🏋🏽‍♀️🏃🏽‍♀️‍➡️ Training and Inference
 The folder ```00_training_and_inference``` contains all code required to carry out training and inference for all the models mentioned in the paper. 
 
@@ -87,16 +91,37 @@ To task-specifically finetune BigVGAN for singing voice separation with Mel-RoFo
 - Bash: ```$ 00_training_and_inference/train_bigvgan.sh```
 
 ## 🧮 Evaluation and Correlation Analysis
-01_evaluation_and_correlation contains the code to compute all objective evaluation metrics and all *.csv files of the evaluated objective audio quality metrics.
+<img src="./gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="50%">  
 
-ADD Evaluation plot here!
+Within the folder ```01_evaluation_and_correlation``` all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
 
-Note: to compute ViSQOL metrics the ViSQOL API from <url>https://github.com/google/visqol</url> has to be installed locally. 
+### Evaluation Data
+All objective metrics are collected in a single file in ```./04_evaluation_data/objective_evaluation_metrics.csv``` and can be found individually in the folder ```./01_evaluation_and_correlation/evaluation_metrics```.   
+The DMOS data can be found in ```./04_evaluation_data/dmos_data.csv```
 
-This folder contains the DMOS data collected with a degradation category rating. \n
-It also contains code to analyze the listening test results. 
 
-It also allows to reproduce the correlation analysis results of the paper.
+
+### Compute Objective Evaluation Metrics
+To calculate all objective metrics mentioned in the paper three python scripts are necessary. The evaluation of PAM as well as the FAD & MSE metrics are carried out in separate scripts. For the computation of the FAD & MSE metrics the conda environment ```gensvs_fad_mse_eval_env``` is necessary. All other metrics can be computed with the ```gensvs_eval_env```.
+
+#### Compute FAD & MSE metrics 
+To compute the FAD and MSE metrics we modified the code of Microsoft's fadtk [5]. The modified code can be found in ```./01_evaluation_and_correlation/fadtk_mod```.    
+The metrics can be computed with a python script. To show how the evaluation script is called we have added a examplary bash scripts.
+- Python: ```./01_evaluation_and_correlation/gensvs_eval_fad_mse.py```
+- Bash: ```$ ./01_evaluation_and_correlation/gensvs_eval_fad_mse.sh```
+#### Compute PAM scores
+To compute the PAM scores of https://github.com/soham97/PAM please use the following scripts:
+- Python: ```./01_evaluation_and_correlation/gensvs_eval_pam.py```
+- Bash: ```$ 01_evaluation_and_correlation/gensvs_eval_pam.sh```
+#### Compute all other non-intrusive and intrusive metrics (BSS-Eval, PEASS, SINGMOS, XLS-R-SQA, Audiobox-AES)
+To compute all other metrics mentioned in the paper please use
+- Python: ```./01_evaluation_and_correlation/gensvs_eval_metrics.py```
+- Bash: ```$ ./01_evaluation_and_correlation/gensvs_eval_metrics.sh```
+
+### Subjective Evaluation
+In order to evaluatio the DMOS data and reproduce the correlation analysis results, we again provide the python script and an exemplary bash script:  
+- Python: ```./01_evaluation_and_correlation/gensvs_eval_dmos_corr.py```
+- Bash: ```./01_evaluation_and_correlation/gensvs_eval_dmos_corr.py```
 
 
 ## 🎼 Audio Examples

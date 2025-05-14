@@ -13,3 +13,4 @@ librosa
 audiobox-aesthetics
 xls-r-sqa
 torchlibrosa
+s3prl
