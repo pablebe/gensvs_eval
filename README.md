@@ -91,7 +91,7 @@ To task-specifically finetune BigVGAN for singing voice separation with Mel-RoFo
 - Bash: ```$ 00_training_and_inference/train_bigvgan.sh```
 
 ## 🧮 Evaluation and Correlation Analysis
-<img src="./gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="50%">  
+<img src="./gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="100%">  
 
 Within the folder ```01_evaluation_and_correlation``` all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
 
