@@ -1,15 +1,9 @@
-#Note for installing visqol on macOS
-#1.) fdopen macro is already defined => installing it with visqol code leads to conflict => zlib.h has to be adapted such that fdopen is not defined
-#2.) armadillo headers are outdated => workspace file needs to be adapted with current version of armadillo header!
-#3.) setup.py needs to be adapted for macOS because of non case sensitive file system => BUILD file conflicts with build folder. See fix at: https://github.com/google/visqol/pull/88/commits/82721c3fb5a5802d5d6ca25073e36ef7d801d7c1 
-#4.) Visqol:Config still seems to not work => returns None object!  
 import torch
 import numpy as np
 import soundfile
 import tqdm
 import shutil
 import os
-import fast_bss_eval
 import matlab.engine
 import pandas as pd
 import subprocess
@@ -32,25 +26,17 @@ eng.compile
 
 audiobox_predictor = initialize_predictor()
 
-
-#CALCULATE_BSS_EVAL = False
-#CALCULATE_PEASS = False
+#use these flags to select which metrics to calculate
 CALCULATE_PEASS_AND_BSS_EVAL = True 
-CALCULATE_SINGMOS_XLS_R = False
-CALCULATE_VISQOL = False
-CALCULATE_AUDIOBOX = False
+CALCULATE_SINGMOS_XLS_R = True
+CALCULATE_VISQOL = True
+CALCULATE_AUDIOBOX = True
 
 REG_CONST = 1e-7
 PERM_FLAG = False
 FILT_LEN = 1024
 
 visqol_cl_api = './bazel-bin/visqol'
-
-
-#os.makedirs(os.path.join('./evaluation/evaluation_results/', output_folder), exist_ok=True)
-#output_path = os.path.join('./evaluation/evaluation_results/', output_folder)
-#visqol_temp_folder = os.path.join(output_path, 'visqol_temp')
-#os.makedirs(visqol_temp_folder, exist_ok=True)
     
 
 
@@ -95,9 +81,7 @@ if __name__ == '__main__':
     
     xls_model.eval()
     
-#    if CALCULATE_VISQOL:
-#       visqol_api, visqol_config = get_visqol_api('audio')
-    
+   
     mixture_files = sorted(glob(os.path.join(args.mixture_dir, '*.wav')))
     target_files = sorted(glob(os.path.join(args.target_dir, '*.wav')))
     sep_files_sgmsvs_from_scratch = sorted(glob(os.path.join(args.separated_dir_sgmsvs_from_scratch, '*.wav')))
@@ -315,18 +299,6 @@ if __name__ == '__main__':
         sep_melroform_large_48k = torch.from_numpy(sep_melroform_large_48k)
         sep_htdemucs_48k = torch.from_numpy(sep_htdemucs_48k)
 
-            
-        # if CALCULATE_BSS_EVAL:
-        #     sdr_scores_noisy.append(sdr(mixture,target))
-        #     si_sdr_scores_noisy.append(si_sdr(mixture, target))
-        #     multi_temp = []
-        #     multi_mel_temp = []
-        #     for ch in range(CH):
-        #         multi_temp.append(multi_res_loss(mixture[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
-        #     multi_res_loss_scores_noisy.append(multi_temp)
-        #     _, tmp_sir, tmp_sar = fast_bss_eval.bss_eval_sources(target, mixture, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
-        #     sir_scores_noisy.append(tmp_sir)
-        #     sar_scores_noisy.append(tmp_sar)
 
         if CALCULATE_PEASS_AND_BSS_EVAL:
             destDir = os.path.join(MatDestDir, 'noisy', file_id)
@@ -341,13 +313,6 @@ if __name__ == '__main__':
             sar_scores_noisy.append(noisy_peass_results['SAR'])
             isr_scores_noisy.append(noisy_peass_results['ISR'])
 
-#        if CALCULATE_PEASS:
-#            destDir = os.path.join(MatDestDir, 'noisy', file_id)
-#            os.makedirs(destDir, exist_ok=True)
-#            MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
-#            original_files = [target_file, interference_file]
-#            noisy_estimate_files = mixture_path
-#            noisy_peass_results = eng.PEASS_ObjectiveMeasure(original_files, noisy_estimate_files, MatOptions)
             ops_scores_noisy.append(noisy_peass_results['OPS'])
             tps_scores_noisy.append(noisy_peass_results['TPS'])
             ips_scores_noisy.append(noisy_peass_results['IPS'])
@@ -377,11 +342,6 @@ if __name__ == '__main__':
             visqol_scores_noisy.append(np.mean(visqol_per_ch))
             shutil.rmtree(visqol_temp_folder)
             os.makedirs(visqol_temp_folder, exist_ok=True)
-#            print("x")
-#            for ch in range(mixture.shape[0]):
-#                similarity_result = visqol_api.Measure(target_48k[ch].numpy().astype('float64'),mixture_48k[ch].numpy().astype('float64'))
-#                visqol_per_ch.append(similarity_result.moslqo)
-#            visqol_scores_noisy.append(np.mean(visqol_per_ch))
             
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":mixture.type(torch.float), "sample_rate":args.sr}])
@@ -389,17 +349,6 @@ if __name__ == '__main__':
             meta_aes_cu_scores_noisy.append(ab_aes[0]['CU'])
 
 
-        # if CALCULATE_BSS_EVAL:
-        #     sdr_scores_sgmsvs_scratch.append(sdr(sep_sgmsvs_scratch,target))
-        #     si_sdr_scores_sgmsvs_scratch.append(si_sdr(sep_sgmsvs_scratch, target))
-        #     multi_temp = []
-        #     multi_mel_temp = []
-        #     for ch in range(CH):
-        #         multi_temp.append(multi_res_loss(sep_sgmsvs_scratch[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
-        #     multi_res_loss_scores_sgmsvs_scratch.append(multi_temp)
-        #     _, tmp_sir, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_sgmsvs_scratch, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
-        #     sir_scores_sgmsvs_scratch.append(tmp_sir)
-        #     sar_scores_sgmsvs_scratch.append(tmp_sar)
 
         if CALCULATE_PEASS_AND_BSS_EVAL:
             destDir = os.path.join(MatDestDir, 'sgmsvs_scratch', file_id)
@@ -414,13 +363,6 @@ if __name__ == '__main__':
             sar_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['SAR'])
             isr_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['ISR'])
         
-#        if CALCULATE_PEASS:
-#            destDir = os.path.join(MatDestDir, 'sgmsvs_scratch', file_id)
-#            os.makedirs(destDir, exist_ok=True)
-#            MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
-#            original_files = [target_file, interference_file]
-#            sgmsvs_scratch_estimate_files = sep_file_sgmsvs_from_scratch
-#            sgmsvs_scratch_peass_results = eng.PEASS_ObjectiveMeasure(original_files, sgmsvs_scratch_estimate_files, MatOptions)
             ops_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['OPS'])
             tps_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['TPS'])
             ips_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['IPS'])
@@ -451,30 +393,12 @@ if __name__ == '__main__':
             os.makedirs(visqol_temp_folder, exist_ok=True)
 
 
-            # visqol_per_ch = []
-            # for ch in range(mixture.shape[0]):
-            #     similarity_result = visqol_api.Measure(target_48k[ch].numpy().astype('float64'),sep_sgmsvs_scratch_48k[ch].numpy().astype('float64'))
-            #     visqol_per_ch.append(similarity_result.moslqo)
-            # visqol_scores_sgmsvs_scratch.append(np.mean(visqol_per_ch))
-
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_sgmsvs_scratch.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_sgmsvs_scratch.append(ab_aes[0]['PQ'])
             meta_aes_cu_scores_sgmsvs_scratch.append(ab_aes[0]['CU'])
                        
-            
-        # if CALCULATE_BSS_EVAL:
-        #     sdr_scores_melroform_bigvgan.append(sdr(sep_melroform_bigvgan,target))
-        #     si_sdr_scores_melroform_bigvgan.append(si_sdr(sep_melroform_bigvgan, target))
-        #     multi_temp = []
-        #     multi_mel_temp = []
-        #     for ch in range(CH):
-        #         multi_temp.append(multi_res_loss(sep_melroform_bigvgan[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
-        #     multi_res_loss_scores_melroform_bigvgan.append(multi_temp)
-        #     _, tmp_sir, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_melroform_bigvgan, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
-        #     sir_scores_melroform_bigvgan.append(tmp_sir)
-        #     sar_scores_melroform_bigvgan.append(tmp_sar)
-
+  
         if CALCULATE_PEASS_AND_BSS_EVAL:
             destDir = os.path.join(MatDestDir, 'melroform_bigvgan', file_id)
             os.makedirs(destDir, exist_ok=True)
@@ -501,24 +425,6 @@ if __name__ == '__main__':
             os.rmdir(os.path.join(destDir,'tmp'))
             del sep_mel_roform_big_vgan_tmp, sr_tmp, tmp_file
     
-    
-#        if CALCULATE_PEASS:
-#            destDir = os.path.join(MatDestDir, 'melroform_bigvgan', file_id)
-#            os.makedirs(destDir, exist_ok=True)
-#            os.makedirs(os.path.join(destDir,'tmp'), exist_ok=True)
-#            MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
-#            original_files = [target_file, interference_file]
-#            melroform_bigvgan_estimate_files = sep_file_melroform_bigvgan
-#            tmp_file = os.path.join(destDir,'tmp','tmp.wav')
-#            sep_mel_roform_big_vgan_tmp, sr_tmp = soundfile.read(sep_file_melroform_bigvgan)
-#            target_len = soundfile.info(target_file).duration
-#            sep_mel_roform_big_vgan_tmp = sep_mel_roform_big_vgan_tmp[:int(target_len*sr_tmp)]
-#            soundfile.write(os.path.join(destDir,'tmp','tmp.wav'),sep_mel_roform_big_vgan_tmp, sr_tmp)
-#            melroform_bigvgan_peass_results = eng.PEASS_ObjectiveMeasure(original_files, tmp_file, MatOptions)
-
-#            os.remove(os.path.join(destDir,'tmp','tmp.wav'))
-#            os.rmdir(os.path.join(destDir,'tmp'))
-#            del sep_mel_roform_big_vgan_tmp, sr_tmp, tmp_file
             
             
         if CALCULATE_SINGMOS_XLS_R:
@@ -544,29 +450,12 @@ if __name__ == '__main__':
             visqol_scores_melroform_bigvgan.append(np.mean(visqol_per_ch))
             shutil.rmtree(visqol_temp_folder)
             os.makedirs(visqol_temp_folder, exist_ok=True)
-            # visqol_per_ch = []
-            # for ch in range(mixture.shape[0]):
-            #     similarity_result = visqol_api.Measure(target_48k[ch].numpy().astype('float64'),sep_melroform_bigvgan_48k[ch].numpy().astype('float64'))
-            #     visqol_per_ch.append(similarity_result.moslqo)
-            # visqol_scores_melroform_bigvgan.append(np.mean(visqol_per_ch))    
 
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_melroform_bigvgan.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_melroform_bigvgan.append(ab_aes[0]['PQ'])
             meta_aes_cu_scores_melroform_bigvgan.append(ab_aes[0]['CU'])
             
-
-        # if CALCULATE_BSS_EVAL:
-        #     sdr_scores_melroform_small.append(sdr(sep_melroform_small,target))
-        #     si_sdr_scores_melroform_small.append(si_sdr(sep_melroform_small, target))
-        #     multi_temp = []
-        #     multi_mel_temp = []
-        #     for ch in range(CH):
-        #         multi_temp.append(multi_res_loss(sep_melroform_small[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
-        #     multi_res_loss_scores_melroform_small.append(multi_temp)
-        #     _, tmp_sir, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_melroform_small, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
-        #     sir_scores_melroform_small.append(tmp_sir)
-        #     sar_scores_melroform_small.append(tmp_sar)
 
         if CALCULATE_PEASS_AND_BSS_EVAL:        
             destDir = os.path.join(MatDestDir, 'melroform', file_id)
@@ -581,13 +470,6 @@ if __name__ == '__main__':
             sar_scores_melroform_small.append(melroform_peass_results['SAR'])
             isr_scores_melroform_small.append(melroform_peass_results['ISR'])
 
-#        if CALCULATE_PEASS:        
-#            destDir = os.path.join(MatDestDir, 'melroform', file_id)
-#            os.makedirs(destDir, exist_ok=True)
-#            MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
-#            original_files = [target_file, interference_file]
-#            melroform_estimate_files = sep_file_melroform_small
-#            melroform_peass_results = eng.PEASS_ObjectiveMeasure(original_files, melroform_estimate_files, MatOptions)
             ops_scores_melroform_small.append(melroform_peass_results['OPS'])
             tps_scores_melroform_small.append(melroform_peass_results['TPS'])
             ips_scores_melroform_small.append(melroform_peass_results['IPS'])
@@ -616,29 +498,12 @@ if __name__ == '__main__':
             visqol_scores_melroform_small.append(np.mean(visqol_per_ch))
             shutil.rmtree(visqol_temp_folder)
             os.makedirs(visqol_temp_folder, exist_ok=True)
-            # visqol_per_ch = []
-            # for ch in range(mixture.shape[0]):
-            #     similarity_result = visqol_api.Measure(target_48k[ch].numpy().astype('float64'),sep_melroform_small_48k[ch].numpy().astype('float64'))
-            #     visqol_per_ch.append(similarity_result.moslqo)
-            # visqol_scores_melroform_small.append(np.mean(visqol_per_ch))
 
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_melroform_small.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_melroform_small.append(ab_aes[0]['PQ'])
             meta_aes_cu_scores_melroform_small.append(ab_aes[0]['CU'])
             
-           
-        # if CALCULATE_BSS_EVAL:
-        #     sdr_scores_melroform_large.append(sdr(sep_melroform_large,target))
-        #     si_sdr_scores_melroform_large.append(si_sdr(sep_melroform_large, target))
-        #     multi_temp = []
-        #     multi_mel_temp = []
-        #     for ch in range(CH):
-        #         multi_temp.append(multi_res_loss(sep_melroform_large[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
-        #     multi_res_loss_scores_melroform_large.append(multi_temp)
-        #     _, tmp_sir, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_melroform_large, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
-        #     sir_scores_melroform_large.append(tmp_sir)
-        #     sar_scores_melroform_large.append(tmp_sar)
 
         if CALCULATE_PEASS_AND_BSS_EVAL:        
             destDir = os.path.join(MatDestDir, 'melroform', file_id)
@@ -653,13 +518,6 @@ if __name__ == '__main__':
             sar_scores_melroform_large.append(melroform_peass_results['SAR'])
             isr_scores_melroform_large.append(melroform_peass_results['ISR'])
 
-#        if CALCULATE_PEASS:        
-#            destDir = os.path.join(MatDestDir, 'melroform', file_id)
-#            os.makedirs(destDir, exist_ok=True)
-#            MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
-#            original_files = [target_file, interference_file]
-#            melroform_estimate_files = sep_file_melroform_large
-#            melroform_peass_results = eng.PEASS_ObjectiveMeasure(original_files, melroform_estimate_files, MatOptions)
             ops_scores_melroform_large.append(melroform_peass_results['OPS'])
             tps_scores_melroform_large.append(melroform_peass_results['TPS'])
             ips_scores_melroform_large.append(melroform_peass_results['IPS'])
@@ -688,28 +546,11 @@ if __name__ == '__main__':
             visqol_scores_melroform_large.append(np.mean(visqol_per_ch))
             shutil.rmtree(visqol_temp_folder)
             os.makedirs(visqol_temp_folder, exist_ok=True)
-            # visqol_per_ch = []
-            # for ch in range(mixture.shape[0]):
-            #     similarity_result = visqol_api.Measure(target_48k[ch].numpy().astype('float64'),sep_melroform_large_48k[ch].numpy().astype('float64'))
-            #     visqol_per_ch.append(similarity_result.moslqo)
-            # visqol_scores_melroform_large.append(np.mean(visqol_per_ch))
             
         if CALCULATE_AUDIOBOX:
             ab_aes = audiobox_predictor.forward([{"path":sep_melroform_large.type(torch.float), "sample_rate":args.sr}])
             meta_aes_pq_scores_melroform_large.append(ab_aes[0]['PQ'])
             meta_aes_cu_scores_melroform_large.append(ab_aes[0]['CU'])
-
-        # if CALCULATE_BSS_EVAL:
-        #     sdr_scores_htdemucs.append(sdr(sep_htdemucs,target))
-        #     si_sdr_scores_htdemucs.append(si_sdr(sep_htdemucs, target))
-        #     multi_temp = []
-        #     multi_mel_temp = []
-        #     for ch in range(CH):
-        #         multi_temp.append(multi_res_loss(sep_htdemucs[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
-        #     multi_res_loss_scores_htdemucs.append(multi_temp)
-        #     _, tmp_sir, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_htdemucs, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
-        #     sir_scores_htdemucs.append(tmp_sir)
-        #     sar_scores_htdemucs.append(tmp_sar)
 
         if CALCULATE_PEASS_AND_BSS_EVAL:
             destDir = os.path.join(MatDestDir, 'htdemucs', file_id)
@@ -724,13 +565,6 @@ if __name__ == '__main__':
             sar_scores_htdemucs.append(htdemucs_peass_results['SAR'])
             isr_scores_htdemucs.append(htdemucs_peass_results['ISR'])
 
-#        if CALCULATE_PEASS:
-#            destDir = os.path.join(MatDestDir, 'htdemucs', file_id)
-#            os.makedirs(destDir, exist_ok=True) 
-#            MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
-#            original_files = [target_file, interference_file]
-#            htdemucs_estimate_files = sep_file_htdemucs
-#            htdemucs_peass_results = eng.PEASS_ObjectiveMeasure(original_files, htdemucs_estimate_files, MatOptions)
             ops_scores_htdemucs.append(htdemucs_peass_results['OPS'])
             tps_scores_htdemucs.append(htdemucs_peass_results['TPS'])
             ips_scores_htdemucs.append(htdemucs_peass_results['IPS'])
@@ -860,38 +694,7 @@ if __name__ == '__main__':
 
     xls_r_sqa_scores_htdemucs = np.array(xls_r_sqa_scores_htdemucs)
 
-    
     row_names = ['noisy', 'sgmsvs', 'melroformer_bigvgan', 'melroformer_small', 'melroformer_large', 'htdemucs']
-
-#     if CALCULATE_BSS_EVAL:
-#         sdr_data =            np.stack((np.mean(sdr_scores_noisy,1), np.mean(sdr_scores_sgmsvs_scratch,1), np.mean(sdr_scores_melroform_bigvgan,1), np.mean(sdr_scores_melroform_small,1), np.mean(sdr_scores_melroform_large,1),  np.mean(sdr_scores_htdemucs,1)), axis=1)
-#         sisdr_data =          np.stack((np.mean(si_sdr_scores_noisy,1), np.mean(si_sdr_scores_sgmsvs_scratch,1), np.mean(si_sdr_scores_melroform_bigvgan, 1), np.mean(si_sdr_scores_melroform_small,1), np.mean(si_sdr_scores_melroform_large,1), np.mean(si_sdr_scores_htdemucs,1)), axis=1)
-#         multi_res_loss_data = np.stack((np.mean(multi_res_loss_scores_noisy,1), np.mean(multi_res_loss_scores_sgmsvs_scratch,1), np.mean(multi_res_loss_scores_melroform_bigvgan,1), np.mean(multi_res_loss_scores_melroform_small,1), np.mean(multi_res_loss_scores_melroform_large,1), np.mean(multi_res_loss_scores_htdemucs,1)), axis=1)
-# #        multi_res_loss_mel_data = np.stack((np.mean(multi_res_loss_mel_scores_noisy,1), np.mean(multi_res_loss_mel_scores_sgmsvs_scratch,1), np.mean(multi_res_loss_mel_scores_melroform_bigvgan,1), np.mean(multi_res_loss_mel_scores_melroform_small,1), np.mean(multi_res_loss_mel_scores_melroform_large,1), np.mean(multi_res_loss_mel_scores_htdemucs,1)),axis=1)
-#         sir_data =            np.stack((np.mean(sir_scores_noisy,1), np.mean(sir_scores_sgmsvs_scratch,1), np.mean(sir_scores_melroform_bigvgan,1), np.mean(sir_scores_melroform_small,1), np.mean(sir_scores_melroform_large,1), np.mean(sir_scores_htdemucs,1)), axis=1)
-#         sar_data =            np.stack((np.mean(sar_scores_noisy,1), np.mean(sar_scores_sgmsvs_scratch,1), np.mean(sar_scores_melroform_bigvgan,1), np.mean(sar_scores_melroform_small,1), np.mean(sar_scores_melroform_large,1), np.mean(sar_scores_htdemucs,1)), axis=1)
-
-#         pd_sdr = pd.DataFrame(sdr_data, columns=row_names)
-#         pd_sisdr = pd.DataFrame(sisdr_data, columns=row_names)
-#         pd_multi_res_loss = pd.DataFrame(multi_res_loss_data, columns=row_names)
-# #        pd_multi_res_loss_mel = pd.DataFrame(multi_res_loss_mel_data, columns=row_names)
-#         pd_sir = pd.DataFrame(sir_data, columns=row_names)
-#         pd_sar = pd.DataFrame(sar_data, columns=row_names)
-        
-#         #concatenate file_order column to each dataframe
-# #        file_order = pd.DataFrame(file_order, columns=['file_order'])
-#         pd_sdr = pd.concat([pd_file_order, pd_sdr], axis=1)
-#         pd_sisdr = pd.concat([pd_file_order, pd_sisdr], axis=1)
-#         pd_multi_res_loss = pd.concat([pd_file_order, pd_multi_res_loss], axis=1)
-#         pd_sir = pd.concat([pd_file_order, pd_sir], axis=1)
-#         pd_sar = pd.concat([pd_file_order, pd_sar], axis=1)
-        
-#         pd_sdr.to_csv(os.path.join(output_path, 'sdr.csv'))
-#         pd_sisdr.to_csv(os.path.join(output_path, 'sisdr.csv'))
-#         pd_multi_res_loss.to_csv(os.path.join(output_path, 'multi_res_loss.csv'))
-# #        pd_multi_res_loss_mel.to_csv(os.path.join(output_path, 'multi_res_loss_mel.csv'))
-#         pd_sir.to_csv(os.path.join(output_path, 'sir.csv'))
-#         pd_sar.to_csv(os.path.join(output_path, 'sar.csv'))
 
     if CALCULATE_PEASS_AND_BSS_EVAL:
         if len(sdr_scores_noisy.shape)>1:
@@ -990,7 +793,6 @@ if __name__ == '__main__':
         
         pd_audiobox_pq.to_csv(os.path.join(output_path, 'meta_audiobox_aes_PQ.csv'))
         pd_audiobox_cu.to_csv(os.path.join(output_path, 'meta_audiobox_aes_CU.csv'))
-        
-
+       
     shutil.rmtree(os.path.join(output_path, 'tmp'))
 

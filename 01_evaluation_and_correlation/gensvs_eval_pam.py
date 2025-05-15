@@ -7,8 +7,6 @@ from tqdm import tqdm
 from pam_eval.PAM import PAM
 from pam_eval.dataset import ExampleDatasetFolder
 EVAL_FILE_ORDER = './01_evaluation_and_correlation/file_id_order.csv'
-RESULTS_PATH = './01_evaluation_and_correlation/evaluation_metrics'
-os.makedirs(RESULTS_PATH, exist_ok=True)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = "PAM")
     parser.add_argument('--mixture_dir', type=str, help='Folder path to evaluate')
@@ -19,7 +17,9 @@ if __name__ == '__main__':
     parser.add_argument('--separated_dir_htdemucs', type=str, help='Folder path to data from htdemucs model')
     parser.add_argument('--batch_size', type=int, default=10, help='Number of examples per batch')
     parser.add_argument('--num_workers', type=int, default=0, help='Number of workers for dataloader')
+    parser.add_argument('--output_folder', type=str, required=True, help='Output folder to save the results')
     args = parser.parse_args()
+    os.makedirs(args.output_folder, exist_ok=True)
 
     # initialize PAM
     pam = PAM(use_cuda=torch.cuda.is_available())
@@ -59,6 +59,6 @@ if __name__ == '__main__':
     #sort the dataframe by the order of the files in eval_file_order
     eval_file_order = pd.read_csv(EVAL_FILE_ORDER).drop(columns=['Unnamed: 0'])
     pam_scores_dataframe = pam_scores_dataframe.loc[eval_file_order['file_id']].reset_index(drop=False,names='file_id')
-    pam_scores_dataframe.to_csv(os.path.join(RESULTS_PATH,'pam.csv'), index=True)
+    pam_scores_dataframe.to_csv(os.path.join(args.output_folder,'pam.csv'), index=True)
 
 
