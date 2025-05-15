@@ -97,8 +97,9 @@ Within the folder ```01_evaluation_and_correlation``` all code to compute all ob
 
 ### Evaluation Data
 All objective metrics are collected in a single file in ```./04_evaluation_data/objective_evaluation_metrics.csv``` and can be found individually in the folder ```./01_evaluation_and_correlation/evaluation_metrics```.   
-The DMOS data can be found in ```./04_evaluation_data/dmos_data.csv```
-
+The DMOS data can be found in ```./04_evaluation_data/dmos_ratings.csv```  
+The raw listening test data including all the individual ratings can be found in ```./04_evaluation_data/dcr_test_ratings.csv```  
+All calculated objective metrics are summarized in ```04_evaluation_data/all_metrics_df.csv``` 
 
 
 ### Compute Objective Evaluation Metrics
@@ -118,17 +119,13 @@ To compute all other metrics mentioned in the paper please use
 - Python: ```./01_evaluation_and_correlation/gensvs_eval_metrics.py```
 - Bash: ```$ ./01_evaluation_and_correlation/gensvs_eval_metrics.sh```
 
-### Subjective Evaluation
-In order to evaluatio the DMOS data and reproduce the correlation analysis results, we again provide the python script and an exemplary bash script:  
+### Subjective Evaluation and correlation analysis
+In order to evaluate the DMOS data and reproduce the correlation analysis results, the python script can be executed under:
 - Python: ```./01_evaluation_and_correlation/gensvs_eval_dmos_corr.py```
-- Bash: ```./01_evaluation_and_correlation/gensvs_eval_dmos_corr.py```
-
 
 ## 🎼 Audio Examples
 In the folder ```03_audio_examples``` 12 audio examples of each model can be found.  
 The audio examples are mono and loudness normalized to -18 dBFS according to EBU R128.
-
-
 
 ## Third party code
 ### Third party folders
