@@ -96,10 +96,9 @@ To task-specifically finetune BigVGAN for singing voice separation with Mel-RoFo
 Within the folder ```01_evaluation_and_correlation``` all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
 
 ### Evaluation Data
-All objective metrics are collected in a single file in ```./04_evaluation_data/objective_evaluation_metrics.csv``` and can be found individually in the folder ```./01_evaluation_and_correlation/evaluation_metrics```.   
+All objective metrics are collected in a single file in ```04_evaluation_data/all_metrics_df.csv``` and can be found individually in the folder ```./01_evaluation_and_correlation/evaluation_metrics```.   
 The DMOS data can be found in ```./04_evaluation_data/dmos_ratings.csv```  
 The raw listening test data including all the individual ratings can be found in ```./04_evaluation_data/dcr_test_ratings.csv```  
-All calculated objective metrics are summarized in ```04_evaluation_data/all_metrics_df.csv``` 
 
 
 ### Compute Objective Evaluation Metrics
