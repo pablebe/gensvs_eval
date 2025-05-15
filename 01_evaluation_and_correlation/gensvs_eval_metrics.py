@@ -7,6 +7,7 @@ import os
 import matlab.engine
 import pandas as pd
 import subprocess
+import fast_bss_eval
 from glob import glob
 from torchmetrics.audio.sdr import scale_invariant_signal_distortion_ratio, signal_distortion_ratio
 from auraloss.freq import MultiResolutionSTFTLoss
@@ -27,10 +28,10 @@ eng.compile
 audiobox_predictor = initialize_predictor()
 
 #use these flags to select which metrics to calculate
-CALCULATE_PEASS_AND_BSS_EVAL = True 
-CALCULATE_SINGMOS_XLS_R = True
-CALCULATE_VISQOL = True
-CALCULATE_AUDIOBOX = True
+CALCULATE_PEASS_BSS_EVAL_AND_MRES = True 
+CALCULATE_SINGMOS_XLS_R = False
+CALCULATE_VISQOL = False
+CALCULATE_AUDIOBOX = False
 
 REG_CONST = 1e-7
 PERM_FLAG = False
@@ -300,17 +301,24 @@ if __name__ == '__main__':
         sep_htdemucs_48k = torch.from_numpy(sep_htdemucs_48k)
 
 
-        if CALCULATE_PEASS_AND_BSS_EVAL:
+        if CALCULATE_PEASS_BSS_EVAL_AND_MRES:
             destDir = os.path.join(MatDestDir, 'noisy', file_id)
             os.makedirs(destDir, exist_ok=True)
             MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
             original_files = [target_file, interference_file]
             noisy_estimate_files = mixture_path
             noisy_peass_results = eng.PEASS_ObjectiveMeasure(original_files, noisy_estimate_files, MatOptions)
-            sdr_scores_noisy.append(noisy_peass_results['SDR'])
+            _, _, tmp_sar = fast_bss_eval.bss_eval_sources(target, mixture, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
+            multi_temp = []
+            multi_mel_temp = []
+            for ch in range(mixture.shape[0]):
+                multi_temp.append(multi_res_loss(mixture[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
+            multi_res_loss_scores_noisy.append(np.mean(multi_temp))
+            
+            sdr_scores_noisy.append(sdr(mixture, target))
             si_sdr_scores_noisy.append(si_sdr(mixture, target))
+            sar_scores_noisy.append(tmp_sar)
             sir_scores_noisy.append(noisy_peass_results['SIR'])
-            sar_scores_noisy.append(noisy_peass_results['SAR'])
             isr_scores_noisy.append(noisy_peass_results['ISR'])
 
             ops_scores_noisy.append(noisy_peass_results['OPS'])
@@ -350,17 +358,25 @@ if __name__ == '__main__':
 
 
 
-        if CALCULATE_PEASS_AND_BSS_EVAL:
+        if CALCULATE_PEASS_BSS_EVAL_AND_MRES:
             destDir = os.path.join(MatDestDir, 'sgmsvs_scratch', file_id)
             os.makedirs(destDir, exist_ok=True)
             MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
             original_files = [target_file, interference_file]
             sgmsvs_scratch_estimate_files = sep_file_sgmsvs_from_scratch
             sgmsvs_scratch_peass_results = eng.PEASS_ObjectiveMeasure(original_files, sgmsvs_scratch_estimate_files, MatOptions)
-            sdr_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['SDR'])
+            _, _, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_sgmsvs_scratch, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
+
+            multi_temp = []
+            multi_mel_temp = []
+            for ch in range(sep_sgmsvs_scratch.shape[0]):
+                multi_temp.append(multi_res_loss(sep_sgmsvs_scratch[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
+            multi_res_loss_scores_sgmsvs_scratch.append(np.mean(multi_temp))
+
+            sdr_scores_sgmsvs_scratch.append(sdr(sep_sgmsvs_scratch, target))
             si_sdr_scores_sgmsvs_scratch.append(si_sdr(sep_sgmsvs_scratch, target))
+            sar_scores_sgmsvs_scratch.append(tmp_sar)
             sir_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['SIR'])
-            sar_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['SAR'])
             isr_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['ISR'])
         
             ops_scores_sgmsvs_scratch.append(sgmsvs_scratch_peass_results['OPS'])
@@ -399,7 +415,7 @@ if __name__ == '__main__':
             meta_aes_cu_scores_sgmsvs_scratch.append(ab_aes[0]['CU'])
                        
   
-        if CALCULATE_PEASS_AND_BSS_EVAL:
+        if CALCULATE_PEASS_BSS_EVAL_AND_MRES:
             destDir = os.path.join(MatDestDir, 'melroform_bigvgan', file_id)
             os.makedirs(destDir, exist_ok=True)
             os.makedirs(os.path.join(destDir,'tmp'), exist_ok=True)
@@ -412,11 +428,20 @@ if __name__ == '__main__':
             sep_mel_roform_big_vgan_tmp = sep_mel_roform_big_vgan_tmp[:int(target_len*sr_tmp)]
             soundfile.write(os.path.join(destDir,'tmp','tmp.wav'),sep_mel_roform_big_vgan_tmp, sr_tmp)
             melroform_bigvgan_peass_results = eng.PEASS_ObjectiveMeasure(original_files, tmp_file, MatOptions)
-            sdr_scores_melroform_bigvgan.append(melroform_bigvgan_peass_results['SDR'])
+            multi_temp = []
+            multi_mel_temp = []
+            for ch in range(sep_melroform_bigvgan.shape[0]):
+                multi_temp.append(multi_res_loss(sep_melroform_bigvgan[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
+            multi_res_loss_scores_melroform_bigvgan.append(np.mean(multi_temp))
+            
+            
+            _, _, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_melroform_bigvgan, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
+            sdr_scores_melroform_bigvgan.append(sdr(sep_melroform_bigvgan, target))
             si_sdr_scores_melroform_bigvgan.append(si_sdr(sep_melroform_bigvgan, target))
+            sar_scores_melroform_bigvgan.append(tmp_sar)
             sir_scores_melroform_bigvgan.append(melroform_bigvgan_peass_results['SIR'])
-            sar_scores_melroform_bigvgan.append(melroform_bigvgan_peass_results['SAR'])
             isr_scores_melroform_bigvgan.append(melroform_bigvgan_peass_results['ISR'])
+            
             ops_scores_melroform_bigvgan.append(melroform_bigvgan_peass_results['OPS'])
             tps_scores_melroform_bigvgan.append(melroform_bigvgan_peass_results['TPS'])
             ips_scores_melroform_bigvgan.append(melroform_bigvgan_peass_results['IPS'])
@@ -457,17 +482,25 @@ if __name__ == '__main__':
             meta_aes_cu_scores_melroform_bigvgan.append(ab_aes[0]['CU'])
             
 
-        if CALCULATE_PEASS_AND_BSS_EVAL:        
+        if CALCULATE_PEASS_BSS_EVAL_AND_MRES:        
             destDir = os.path.join(MatDestDir, 'melroform', file_id)
             os.makedirs(destDir, exist_ok=True)
             MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
             original_files = [target_file, interference_file]
             melroform_estimate_files = sep_file_melroform_small
             melroform_peass_results = eng.PEASS_ObjectiveMeasure(original_files, melroform_estimate_files, MatOptions)
-            sdr_scores_melroform_small.append(melroform_peass_results['SDR'])
+            _, _, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_melroform_small, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
+
+            multi_temp = []
+            multi_mel_temp = []
+            for ch in range(sep_melroform_small.shape[0]):
+                multi_temp.append(multi_res_loss(sep_melroform_small[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
+            multi_res_loss_scores_melroform_small.append(np.mean(multi_temp))
+
+            sdr_scores_melroform_small.append(sdr(sep_melroform_small, target))
             si_sdr_scores_melroform_small.append(si_sdr(sep_melroform_small, target))
+            sar_scores_melroform_small.append(tmp_sar)
             sir_scores_melroform_small.append(melroform_peass_results['SIR'])
-            sar_scores_melroform_small.append(melroform_peass_results['SAR'])
             isr_scores_melroform_small.append(melroform_peass_results['ISR'])
 
             ops_scores_melroform_small.append(melroform_peass_results['OPS'])
@@ -505,17 +538,25 @@ if __name__ == '__main__':
             meta_aes_cu_scores_melroform_small.append(ab_aes[0]['CU'])
             
 
-        if CALCULATE_PEASS_AND_BSS_EVAL:        
+        if CALCULATE_PEASS_BSS_EVAL_AND_MRES:        
             destDir = os.path.join(MatDestDir, 'melroform', file_id)
             os.makedirs(destDir, exist_ok=True)
             MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
             original_files = [target_file, interference_file]
             melroform_estimate_files = sep_file_melroform_large
             melroform_peass_results = eng.PEASS_ObjectiveMeasure(original_files, melroform_estimate_files, MatOptions)
-            sdr_scores_melroform_large.append(melroform_peass_results['SDR'])
+            _, _, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_melroform_large, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
+
+            multi_temp = []
+            multi_mel_temp = []
+            for ch in range(sep_melroform_large.shape[0]):
+                multi_temp.append(multi_res_loss(sep_melroform_large[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
+            multi_res_loss_scores_melroform_large.append(np.mean(multi_temp))
+
+            sdr_scores_melroform_large.append(sdr(sep_melroform_large, target))
             si_sdr_scores_melroform_large.append(si_sdr(sep_melroform_large, target))
+            sar_scores_melroform_large.append(tmp_sar)
             sir_scores_melroform_large.append(melroform_peass_results['SIR'])
-            sar_scores_melroform_large.append(melroform_peass_results['SAR'])
             isr_scores_melroform_large.append(melroform_peass_results['ISR'])
 
             ops_scores_melroform_large.append(melroform_peass_results['OPS'])
@@ -552,17 +593,25 @@ if __name__ == '__main__':
             meta_aes_pq_scores_melroform_large.append(ab_aes[0]['PQ'])
             meta_aes_cu_scores_melroform_large.append(ab_aes[0]['CU'])
 
-        if CALCULATE_PEASS_AND_BSS_EVAL:
+        if CALCULATE_PEASS_BSS_EVAL_AND_MRES:
             destDir = os.path.join(MatDestDir, 'htdemucs', file_id)
             os.makedirs(destDir, exist_ok=True) 
             MatOptions = {'destDir':destDir+os.path.sep, 'segmentationFactor':1}
             original_files = [target_file, interference_file]
             htdemucs_estimate_files = sep_file_htdemucs
             htdemucs_peass_results = eng.PEASS_ObjectiveMeasure(original_files, htdemucs_estimate_files, MatOptions)
-            sdr_scores_htdemucs.append(htdemucs_peass_results['SDR'])
+            _, _, tmp_sar = fast_bss_eval.bss_eval_sources(target, sep_htdemucs, load_diag=REG_CONST, compute_permutation=PERM_FLAG, filter_length=FILT_LEN)
+
+            multi_temp = []
+            multi_mel_temp = []
+            for ch in range(sep_htdemucs.shape[0]):
+                multi_temp.append(multi_res_loss(sep_htdemucs[ch,...].float().unsqueeze(0).unsqueeze(0), target[ch,...].float().unsqueeze(0).unsqueeze(0)))
+            multi_res_loss_scores_htdemucs.append(np.mean(multi_temp))
+
+            sdr_scores_htdemucs.append(sdr(sep_htdemucs, target))
             si_sdr_scores_htdemucs.append(si_sdr(sep_htdemucs, target))
+            sar_scores_htdemucs.append(tmp_sar)
             sir_scores_htdemucs.append(htdemucs_peass_results['SIR'])
-            sar_scores_htdemucs.append(htdemucs_peass_results['SAR'])
             isr_scores_htdemucs.append(htdemucs_peass_results['ISR'])
 
             ops_scores_htdemucs.append(htdemucs_peass_results['OPS'])
@@ -696,13 +745,14 @@ if __name__ == '__main__':
 
     row_names = ['noisy', 'sgmsvs', 'melroformer_bigvgan', 'melroformer_small', 'melroformer_large', 'htdemucs']
 
-    if CALCULATE_PEASS_AND_BSS_EVAL:
+    if CALCULATE_PEASS_BSS_EVAL_AND_MRES:
         if len(sdr_scores_noisy.shape)>1:
             sdr_data = np.stack((np.mean(sdr_scores_noisy,1), np.mean(sdr_scores_sgmsvs_scratch,1), np.mean(sdr_scores_melroform_bigvgan,1), np.mean(sdr_scores_melroform_small,1), np.mean(sdr_scores_melroform_large,1),  np.mean(sdr_scores_htdemucs,1)), axis=1)
             sisdr_data = np.stack((np.mean(si_sdr_scores_noisy,1), np.mean(si_sdr_scores_sgmsvs_scratch,1), np.mean(si_sdr_scores_melroform_bigvgan,1), np.mean(si_sdr_scores_melroform_small,1), np.mean(si_sdr_scores_melroform_large,1), np.mean(si_sdr_scores_htdemucs,1)), axis=1)
-            sir_data = np.stack((np.mean(sir_scores_noisy,1), np.mean(sir_scores_sgmsvs_scratch,1), np.mean(sir_scores_melroform_bigvgan,1), np.mean(sir_scores_melroform_small,1), np.mean(sir_scores_melroform_large,1), np.mean(sir_scores_htdemucs,1)), axis=1)
             sar_data = np.stack((np.mean(sar_scores_noisy,1), np.mean(sar_scores_sgmsvs_scratch,1), np.mean(sar_scores_melroform_bigvgan,1), np.mean(sar_scores_melroform_small,1), np.mean(sar_scores_melroform_large,1), np.mean(sar_scores_htdemucs,1)), axis=1)
             isr_data = np.stack((isr_scores_noisy, isr_scores_sgmsvs_scratch, isr_scores_melroform_bigvgan, isr_scores_melroform_small, isr_scores_melroform_large, isr_scores_htdemucs), axis=1)
+            sir_data = np.stack((sir_scores_noisy, sir_scores_sgmsvs_scratch, sir_scores_melroform_bigvgan, sir_scores_melroform_small, sir_scores_melroform_large, sir_scores_htdemucs), axis=1)
+
         else:
             #no mean
             sdr_data = np.stack((sdr_scores_noisy, sdr_scores_sgmsvs_scratch, sdr_scores_melroform_bigvgan, sdr_scores_melroform_small, sdr_scores_melroform_large,  sdr_scores_htdemucs), axis=1)
@@ -724,11 +774,12 @@ if __name__ == '__main__':
         pd_sar = pd.concat([pd_file_order, pd_sar], axis=1)
         pd_isr = pd.concat([pd_file_order, pd_isr], axis=1)
         
-        pd_sdr.to_csv(os.path.join(output_path, 'sdr_peass.csv'))
-        pd_sisdr.to_csv(os.path.join(output_path, 'sisdr_peass.csv'))
-        pd_sir.to_csv(os.path.join(output_path, 'sir_peass.csv'))
-        pd_sar.to_csv(os.path.join(output_path, 'sar_peass.csv'))
-        pd_isr.to_csv(os.path.join(output_path, 'isr_peass.csv'))
+        pd_sdr.to_csv(os.path.join(output_path, 'sdr.csv'))
+        pd_sisdr.to_csv(os.path.join(output_path, 'sisdr.csv'))
+        pd_sir.to_csv(os.path.join(output_path, 'sir.csv'))
+        pd_sar.to_csv(os.path.join(output_path, 'sar.csv'))
+        pd_isr.to_csv(os.path.join(output_path, 'isr.csv'))
+        
         
 #    if CALCULATE_PEASS:     
         ops_data = np.stack((ops_scores_noisy, ops_scores_sgmsvs_scratch, ops_scores_melroform_bigvgan, ops_scores_melroform_small, ops_scores_melroform_large, ops_scores_htdemucs), axis=1)
@@ -752,6 +803,13 @@ if __name__ == '__main__':
         pd_tps.to_csv(os.path.join(output_path, 'tps.csv'))
         pd_ips.to_csv(os.path.join(output_path, 'ips.csv'))
         pd_aps.to_csv(os.path.join(output_path, 'aps.csv'))
+        
+        
+        mres_data = np.stack((multi_res_loss_scores_noisy, multi_res_loss_scores_sgmsvs_scratch, multi_res_loss_scores_melroform_bigvgan, multi_res_loss_scores_melroform_small, multi_res_loss_scores_melroform_large, multi_res_loss_scores_htdemucs), axis=1)
+        pd_mres = pd.DataFrame(mres_data, columns=row_names)
+        #concatenate file_order
+        pd_mres = pd.concat([pd_file_order, pd_mres], axis=1)
+        pd_mres.to_csv(os.path.join(output_path, 'multi_res_loss.csv'))
         
     if CALCULATE_SINGMOS_XLS_R:   
         singmos_data = np.stack((singmos_scores_noisy, singmos_scores_sgmsvs_scratch, singmos_scores_melroform_bigvgan, singmos_scores_melroform_small, singmos_scores_melroform_large, singmos_scores_htdemucs), axis=1)

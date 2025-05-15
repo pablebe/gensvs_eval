@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import shutil
 from fadtk import cache_embedding_files
 from fadtk_mod.fad_mod import FrechetAudioDistance
 from fadtk_mod.model_loader_mod import *
@@ -212,4 +213,7 @@ if __name__ == '__main__':
     fad_song2song_clap_music_df.to_csv(os.path.join(args.output_folder,'fad_song2song_clap_music_df.csv'))
     fad_song2song_mert_df.to_csv(os.path.join(args.output_folder,'fad_song2song_mert_df.csv'))
     fad_song2song_music2latent_df.to_csv(os.path.join(args.output_folder,'fad_song2song_music2latent_df.csv'))
+    
+    #remove temp folder
+    shutil.rmtree(os.path.join(args.output_folder,'fad_mse_temp'))
     

@@ -14,3 +14,6 @@ audiobox-aesthetics
 xls-r-sqa
 torchlibrosa
 s3prl
+seaborn
+scikit-posthocs
+statannotations
