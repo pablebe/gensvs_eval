@@ -243,8 +243,39 @@ print('-------------------------------------------------------------------------
 print('\n')
 
 
-## Correlation analysis: Calculate Pearson and Spearman correlation between DMOS and metrics
+## Outlier Screening according to ITU P.808
+col_names = ratings_df.columns
+# get all columns with substring 'rating' in them
+rating_cols = [col for col in col_names if 'rating' in col and not('subject' in col)]
+subject_cols = [col for col in col_names if 'subject' in col]
+ratings_individual = ratings_df[rating_cols].T
+subjects_individual = ratings_df[subject_cols].T
+# analyze for outliers according to P.808 with 3.29 threshold over all groups
+z_score_ratings = ratings_individual.transform(lambda x: (x - x.mean()) / x.std(ddof=0) if x.std(ddof=0) != 0 else 0)
+outliers_bool = z_score_ratings.abs() > 3.29
+# get columns and rows of outliers
+row_idx, col_idx = np.where(outliers_bool)
+outlier_subjects = []
+for (row_id,col_id) in zip(row_idx, col_idx):
+    outlier_subjects.append(subjects_individual.iloc[row_id][col_id])
+total_n_outliers = len(outlier_subjects)
+outlier_subj, n_outliers_per_subj = np.unique(outlier_subjects, return_counts=True)
+#create dict with outlier_subj and n_outliers_per_subj
+outlier_subj_dict = {}
+for i in range(len(outlier_subj)):
+    outlier_subj_dict[outlier_subj[i]] = n_outliers_per_subj[i]
+    
+print('---------------------------------------------------------------------------------------------------------------------------------------------------------')
+print('-------------------------------------------------------------------Outlier Information-------------------------------------------------------------------')
+print('---------------------------------------------------------------------------------------------------------------------------------------------------------')
+print("According to the 3.29 threshold of P.808, there are " + str(total_n_outliers) + " outliers in the all ratings.")
+print("The following subjects created outliers: " + str(outlier_subj_dict))
+print("Subjects with more than 2 outliers: " + str(np.array(outlier_subj)[np.array(n_outliers_per_subj)>2]))
+print("Subjects to neglect: " + str(len(np.array(outlier_subj)[np.array(n_outliers_per_subj)>2])))
+print('---------------------------------------------------------------------------------------------------------------------------------------------------------')
 
+
+## Correlation analysis: Calculate Pearson and Spearman correlation between DMOS and metrics
 discriminative_models = ['htdemucs', 'melroformer_small', 'melroformer_large']
 generative_models = ['melroformer_bigvgan', 'sgmsvs']
 dmos_df_discriminative = ratings_df[ratings_df['model_name'].isin(discriminative_models)]
