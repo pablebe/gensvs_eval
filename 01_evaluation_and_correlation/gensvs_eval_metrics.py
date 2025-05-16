@@ -197,7 +197,7 @@ if __name__ == '__main__':
     pd_file_order.to_csv(os.path.join(output_path, 'file_id_order.csv'))
 
 
-    for mixture_path in tqdm.tqdm(mixture_files, desc='Calculating Metrics'):
+    for mixture_path in tqdm.tqdm(mixture_files[:3], desc='Calculating Metrics'):
 
         file_id = mixture_path.split(os.path.sep)[-1].split('mixture_')[-1].split('.wav')[0]
         
