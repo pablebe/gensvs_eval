@@ -112,11 +112,11 @@ Within the folder ```01_evaluation_and_correlation``` all code to compute all ob
 All objective metrics are collected in a single file in ```./04_evaluation_data/all_metrics_df.csv``` and can be found individually in the folder ```./01_evaluation_and_correlation/evaluation_metrics```.   
 The DMOS data can be found in ```./04_evaluation_data/dmos_ratings.csv```  
 The raw listening test data including all the individual ratings can be found in ```./04_evaluation_data/dcr_test_ratings.csv```  
-
+>Note: To evaluate all models and reproduce the results from the paper, the whole MUSDB18-HQ test-set needs to be processed with each model using the inference scripts. Or the processed audio files can be downloaded from: https://drive.google.com/drive/folders/16Yaz2Anws8G530M_4V0h12AcpRY3zMMJ?usp=sharing.
 
 ### Compute Objective Evaluation Metrics
 To calculate all objective metrics mentioned in the paper three python scripts are necessary. The evaluation of PAM as well as the FAD & MSE metrics are carried out in separate scripts. For the computation of the FAD & MSE metrics the conda environment ```gensvs_fad_mse_eval_env``` is necessary. All other metrics can be computed with the ```gensvs_eval_env```.
->Note: To evaluate all models and reproduce the results from the paper, the whole MUSDB18-HQ test-set needs to be processed with each model using the inference scripts. Or the processed audio files can be downloaded from: https://drive.google.com/drive/folders/16Yaz2Anws8G530M_4V0h12AcpRY3zMMJ?usp=sharing.
+
 #### Compute FAD & MSE metrics 
 To compute the FAD and MSE metrics we modified the code of Microsoft's fadtk [5]. The modified code can be found in ```./01_evaluation_and_correlation/fadtk_mod```.
 The metrics can be computed with a python script. To show how the evaluation script is called we have added a examplary bash scripts.
