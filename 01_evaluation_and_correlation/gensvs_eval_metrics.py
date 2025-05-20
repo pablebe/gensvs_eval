@@ -426,7 +426,7 @@ if __name__ == '__main__':
             sep_mel_roform_big_vgan_tmp, sr_tmp = soundfile.read(sep_file_melroform_bigvgan)
             target_len = soundfile.info(target_file).duration
             sep_mel_roform_big_vgan_tmp = sep_mel_roform_big_vgan_tmp[:int(target_len*sr_tmp)]
-            soundfile.write(os.path.join(destDir,'tmp','tmp.wav'),sep_mel_roform_big_vgan_tmp, sr_tmp)
+            soundfile.write(tmp_file, sep_mel_roform_big_vgan_tmp, sr_tmp)
             melroform_bigvgan_peass_results = eng.PEASS_ObjectiveMeasure(original_files, tmp_file, MatOptions)
             multi_temp = []
             multi_mel_temp = []
@@ -481,7 +481,6 @@ if __name__ == '__main__':
             meta_aes_pq_scores_melroform_bigvgan.append(ab_aes[0]['PQ'])
             meta_aes_cu_scores_melroform_bigvgan.append(ab_aes[0]['CU'])
             
-
         if CALCULATE_PEASS_BSS_EVAL_AND_MRES:        
             destDir = os.path.join(MatDestDir, 'melroform', file_id)
             os.makedirs(destDir, exist_ok=True)
@@ -649,7 +648,6 @@ if __name__ == '__main__':
             meta_aes_pq_scores_htdemucs.append(ab_aes[0]['PQ'])
             meta_aes_cu_scores_htdemucs.append(ab_aes[0]['CU'])
             
-
     sdr_scores_noisy = np.array(sdr_scores_noisy)
     si_sdr_scores_noisy = np.array(si_sdr_scores_noisy)
     multi_res_loss_scores_noisy = np.array(multi_res_loss_scores_noisy)
@@ -710,7 +708,6 @@ if __name__ == '__main__':
     meta_aes_cu_scores_melroform_small = np.array(meta_aes_cu_scores_melroform_small)
     xls_r_sqa_scores_melroform_small = np.array(xls_r_sqa_scores_melroform_small)
 
-
     sdr_scores_melroform_large = np.array(sdr_scores_melroform_large)
     si_sdr_scores_melroform_large = np.array(si_sdr_scores_melroform_large)
     multi_res_loss_scores_melroform_large = np.array(multi_res_loss_scores_melroform_large)
@@ -725,7 +722,6 @@ if __name__ == '__main__':
     meta_aes_pq_scores_melroform_large = np.array(meta_aes_pq_scores_melroform_large)
     meta_aes_cu_scores_melroform_large = np.array(meta_aes_cu_scores_melroform_large)
     xls_r_sqa_scores_melroform_large = np.array(xls_r_sqa_scores_melroform_large)
-
 
     sdr_scores_htdemucs = np.array(sdr_scores_htdemucs)
     si_sdr_scores_htdemucs = np.array(si_sdr_scores_htdemucs)
@@ -750,17 +746,14 @@ if __name__ == '__main__':
             sdr_data = np.stack((np.mean(sdr_scores_noisy,1), np.mean(sdr_scores_sgmsvs_scratch,1), np.mean(sdr_scores_melroform_bigvgan,1), np.mean(sdr_scores_melroform_small,1), np.mean(sdr_scores_melroform_large,1),  np.mean(sdr_scores_htdemucs,1)), axis=1)
             sisdr_data = np.stack((np.mean(si_sdr_scores_noisy,1), np.mean(si_sdr_scores_sgmsvs_scratch,1), np.mean(si_sdr_scores_melroform_bigvgan,1), np.mean(si_sdr_scores_melroform_small,1), np.mean(si_sdr_scores_melroform_large,1), np.mean(si_sdr_scores_htdemucs,1)), axis=1)
             sar_data = np.stack((np.mean(sar_scores_noisy,1), np.mean(sar_scores_sgmsvs_scratch,1), np.mean(sar_scores_melroform_bigvgan,1), np.mean(sar_scores_melroform_small,1), np.mean(sar_scores_melroform_large,1), np.mean(sar_scores_htdemucs,1)), axis=1)
-            isr_data = np.stack((isr_scores_noisy, isr_scores_sgmsvs_scratch, isr_scores_melroform_bigvgan, isr_scores_melroform_small, isr_scores_melroform_large, isr_scores_htdemucs), axis=1)
-            sir_data = np.stack((sir_scores_noisy, sir_scores_sgmsvs_scratch, sir_scores_melroform_bigvgan, sir_scores_melroform_small, sir_scores_melroform_large, sir_scores_htdemucs), axis=1)
-
         else:
             #no mean
             sdr_data = np.stack((sdr_scores_noisy, sdr_scores_sgmsvs_scratch, sdr_scores_melroform_bigvgan, sdr_scores_melroform_small, sdr_scores_melroform_large,  sdr_scores_htdemucs), axis=1)
             sisdr_data = np.stack((np.mean(si_sdr_scores_noisy,1), np.mean(si_sdr_scores_sgmsvs_scratch,1), np.mean(si_sdr_scores_melroform_bigvgan,1), np.mean(si_sdr_scores_melroform_small,1), np.mean(si_sdr_scores_melroform_large,1), np.mean(si_sdr_scores_htdemucs,1)), axis=1)
-            sir_data = np.stack((sir_scores_noisy, sir_scores_sgmsvs_scratch, sir_scores_melroform_bigvgan, sir_scores_melroform_small, sir_scores_melroform_large, sir_scores_htdemucs), axis=1)
             sar_data = np.stack((sar_scores_noisy, sar_scores_sgmsvs_scratch, sar_scores_melroform_bigvgan, sar_scores_melroform_small, sar_scores_melroform_large, sar_scores_htdemucs), axis=1)
-            isr_data = np.stack((isr_scores_noisy, isr_scores_sgmsvs_scratch, isr_scores_melroform_bigvgan, isr_scores_melroform_small, isr_scores_melroform_large, isr_scores_htdemucs), axis=1)
-            
+        isr_data = np.stack((isr_scores_noisy, isr_scores_sgmsvs_scratch, isr_scores_melroform_bigvgan, isr_scores_melroform_small, isr_scores_melroform_large, isr_scores_htdemucs), axis=1)
+        sir_data = np.stack((sir_scores_noisy, sir_scores_sgmsvs_scratch, sir_scores_melroform_bigvgan, sir_scores_melroform_small, sir_scores_melroform_large, sir_scores_htdemucs), axis=1)
+
         pd_sdr = pd.DataFrame(sdr_data, columns=row_names)
         pd_sisdr = pd.DataFrame(sisdr_data, columns=row_names)
         pd_sir = pd.DataFrame(sir_data, columns=row_names)
@@ -786,7 +779,6 @@ if __name__ == '__main__':
         tps_data = np.stack((tps_scores_noisy, tps_scores_sgmsvs_scratch, tps_scores_melroform_bigvgan, tps_scores_melroform_small, tps_scores_melroform_large, tps_scores_htdemucs), axis=1)
         ips_data = np.stack((ips_scores_noisy, ips_scores_sgmsvs_scratch, ips_scores_melroform_bigvgan, ips_scores_melroform_small, ips_scores_melroform_large, ips_scores_htdemucs), axis=1) 
         aps_data = np.stack((aps_scores_noisy, aps_scores_sgmsvs_scratch, aps_scores_melroform_bigvgan, aps_scores_melroform_small, aps_scores_melroform_large, aps_scores_htdemucs), axis=1)   
-        isr_data = np.stack((isr_scores_noisy, isr_scores_sgmsvs_scratch, ips_scores_melroform_bigvgan, isr_scores_melroform_small, isr_scores_melroform_large, isr_scores_htdemucs), axis=1)
     
         pd_ops = pd.DataFrame(ops_data, columns=row_names)
         pd_tps = pd.DataFrame(tps_data, columns=row_names)
