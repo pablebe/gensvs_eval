@@ -485,8 +485,8 @@ metric_short_label_dict = {
                      'fad_individal_per_song_clap_music_df': '$\mathregular{CL^*_{m}}$',
                      'fad_individal_per_song_mert_df': 'M-L12$^*$',
                      'fad_individal_per_song_music2latent_df': 'M2L$^*$',
-                     'fad_song2song_clap_audio_df': '$\mathregular{C_{a}}$',
-                     'fad_song2song_clap_music_df': '$\mathregular{C_{m}}$',
+                     'fad_song2song_clap_audio_df': '$\mathregular{CL_{a}}$',
+                     'fad_song2song_clap_music_df': '$\mathregular{CL_{m}}$',
                      'fad_song2song_mert_df': 'M-L12',
                      'fad_song2song_music2latent_df': 'M2L',  
                      'fad_clap_audio_per_song_df': '$\mathregular{CL^*_{a}}$',
@@ -628,7 +628,7 @@ for metric_id, metric in enumerate(merged_srcc['metric']):
     sc=ax.scatter(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0], merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], color=color, edgecolor=[0.5,0.5,0.5], alpha=1, marker=marker_type, label=label if label_ct==1 else "",s=60)
     if metric == 'sisdr' or metric == 'sdr'  or 'emb_mse_clap' in metric or metric == 'emb_mse_music2latent_df' or 'audiobox' in metric or metric == 'fad_individal_per_song_mert_df':
         ax.text(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0]+white_space, merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], metric_short_label_dict[metric], fontsize=13, ha='left', va='top')  # Adjust alignment as needed
-    elif  metric == 'fad_individal_per_song_clap_audio_df' :
+    elif  metric == 'fad_song2song_clap_audio_df' or metric == 'fad_song2song_clap_music_df' :
         ax.text(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0]-white_space, merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], metric_short_label_dict[metric], fontsize=13, ha='right', va='top')  # Adjust alignment as needed
     elif metric == 'sar' or metric == 'isr'  or metric == 'fad_individal_per_song_clap_music_df':
         ax.text(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0]-white_space, merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], metric_short_label_dict[metric], fontsize=13, ha='right', va='bottom')  # Adjust alignment as needed
@@ -661,7 +661,6 @@ plt.tight_layout()
 if SAVE_FIGURES:
         plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.pdf'), format='pdf', bbox_inches='tight')
         plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.png'), format='png',dpi=300, bbox_inches='tight')
-        
 
 
 
