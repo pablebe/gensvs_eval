@@ -485,10 +485,10 @@ metric_short_label_dict = {
                      'fad_individal_per_song_clap_music_df': '$\mathregular{CL^*_{m}}$',
                      'fad_individal_per_song_mert_df': 'M-L12$^*$',
                      'fad_individal_per_song_music2latent_df': 'M2L$^*$',
-                     'fad_song2song_clap_audio_df': '$\mathregular{CL_{a}}$',
-                     'fad_song2song_clap_music_df': '$\mathregular{CL_{m}}$',
-                     'fad_song2song_mert_df': 'M-L12',
-                     'fad_song2song_music2latent_df': 'M2L',  
+                     'fad_song2song_clap_audio_df': '$\mathregular{CL^*_{a}}$',
+                     'fad_song2song_clap_music_df': '$\mathregular{CL^*_{m}}$',
+                     'fad_song2song_mert_df': 'M-L12$^*$',
+                     'fad_song2song_music2latent_df': 'M2L$^*$',  
                      'fad_clap_audio_per_song_df': '$\mathregular{CL^*_{a}}$',
                      'fad_clap_music_per_song_df': '$\mathregular{CL^*_{m}}$',
                      'fad_mert_per_song_df': 'M-L12$^*$',
@@ -661,7 +661,6 @@ plt.tight_layout()
 if SAVE_FIGURES:
         plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.pdf'), format='pdf', bbox_inches='tight')
         plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.png'), format='png',dpi=300, bbox_inches='tight')
-
 
 
 
