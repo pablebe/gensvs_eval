@@ -18,7 +18,7 @@ matplotlib.rcParams['xtick.labelsize'] = 14    # X tick labels
 matplotlib.rcParams['ytick.labelsize'] = 11    # Y tick labels
 matplotlib.rcParams['legend.fontsize'] = 11  # Set legend font size
 
-SAVE_FIGURES = True
+SAVE_FIGURES = False
 
 RATINGS_PATH = './04_evaluation_data/dcr_test_ratings.csv'
 METRICS_PATH = './01_evaluation_and_correlation/evaluation_metrics'
@@ -31,7 +31,7 @@ ALL_METRICS_OUTPATH = './04_evaluation_data'
 P_VAL_THRESHOLD = 0.05
 P_VAL_THRESHOLD_2 = 0.01
 P_VAL_THRESHOLD_3 = 0.001
-gen_models = ['melroformer_bigvgan', 'sgmsvs']
+gen_models = ['sgmsvs', 'melroformer_bigvgan']
 disc_models = ['melroformer_large', 'melroformer_small', 'htdemucs']
 
 def add_gen_disc_column(row):
@@ -276,12 +276,10 @@ print('-------------------------------------------------------------------------
 
 
 ## Correlation analysis: Calculate Pearson and Spearman correlation between DMOS and metrics
-discriminative_models = ['htdemucs', 'melroformer_small', 'melroformer_large']
-generative_models = ['melroformer_bigvgan', 'sgmsvs']
-dmos_df_discriminative = ratings_df[ratings_df['model_name'].isin(discriminative_models)]
-metrics_df_discriminative = metrics_df[metrics_df['model_name'].isin(discriminative_models)]
-dmos_df_generative = ratings_df[ratings_df['model_name'].isin(generative_models)]
-metrics_df_generative = metrics_df[metrics_df['model_name'].isin(generative_models)]
+dmos_df_discriminative = ratings_df[ratings_df['model_name'].isin(disc_models)]
+metrics_df_discriminative = metrics_df[metrics_df['model_name'].isin(disc_models)]
+dmos_df_generative = ratings_df[ratings_df['model_name'].isin(gen_models)]
+metrics_df_generative = metrics_df[metrics_df['model_name'].isin(gen_models)]
 
 
 corr_df_discriminative = pd.DataFrame(columns=['metric', 'pearson_correlation', 'p_val_pearson', 'linear_relation_by_pearson', 'spearman_correlation', 'p_val_spearman', 'monotonic_relation_by_spearman'])
