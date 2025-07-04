@@ -18,7 +18,8 @@ matplotlib.rcParams['xtick.labelsize'] = 14    # X tick labels
 matplotlib.rcParams['ytick.labelsize'] = 11    # Y tick labels
 matplotlib.rcParams['legend.fontsize'] = 11  # Set legend font size
 
-SAVE_FIGURES = False
+SAVE_FIGURES = True
+PLOT_W_SIGNIFICANCE = False
 
 RATINGS_PATH = './04_evaluation_data/dcr_test_ratings.csv'
 METRICS_PATH = './01_evaluation_and_correlation/evaluation_metrics'
@@ -31,7 +32,7 @@ ALL_METRICS_OUTPATH = './04_evaluation_data'
 P_VAL_THRESHOLD = 0.05
 P_VAL_THRESHOLD_2 = 0.01
 P_VAL_THRESHOLD_3 = 0.001
-gen_models = ['sgmsvs', 'melroformer_bigvgan']
+gen_models = ['melroformer_bigvgan', 'sgmsvs']
 disc_models = ['melroformer_large', 'melroformer_small', 'htdemucs']
 
 def add_gen_disc_column(row):
@@ -276,10 +277,12 @@ print('-------------------------------------------------------------------------
 
 
 ## Correlation analysis: Calculate Pearson and Spearman correlation between DMOS and metrics
-dmos_df_discriminative = ratings_df[ratings_df['model_name'].isin(disc_models)]
-metrics_df_discriminative = metrics_df[metrics_df['model_name'].isin(disc_models)]
-dmos_df_generative = ratings_df[ratings_df['model_name'].isin(gen_models)]
-metrics_df_generative = metrics_df[metrics_df['model_name'].isin(gen_models)]
+discriminative_models = ['htdemucs', 'melroformer_small', 'melroformer_large']
+generative_models = ['melroformer_bigvgan', 'sgmsvs']
+dmos_df_discriminative = ratings_df[ratings_df['model_name'].isin(discriminative_models)]
+metrics_df_discriminative = metrics_df[metrics_df['model_name'].isin(discriminative_models)]
+dmos_df_generative = ratings_df[ratings_df['model_name'].isin(generative_models)]
+metrics_df_generative = metrics_df[metrics_df['model_name'].isin(generative_models)]
 
 
 corr_df_discriminative = pd.DataFrame(columns=['metric', 'pearson_correlation', 'p_val_pearson', 'linear_relation_by_pearson', 'spearman_correlation', 'p_val_spearman', 'monotonic_relation_by_spearman'])
@@ -330,11 +333,11 @@ model_DMOS_model_name_idx.sort_index(inplace=True)
 for model_name in np.unique(model_DMOS_sorted['model_name'].to_numpy()):
     model_DMOS_group = pd.concat([model_DMOS_group, pd.DataFrame(model_DMOS_model_name_idx.loc[model_name].to_numpy(),columns=[model_name])], axis=1)
     
-# kruskal vallis test for all models
-kruskal_stat, kruskal_p_val = stats.kruskal(model_DMOS.set_index('model_name').loc['htdemucs']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_large']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_small']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_bigvgan']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['sgmsvs']['DMOS'].to_numpy())
-print(f"Kruskal-Wallis H-test: H={kruskal_stat:.4f}, p={kruskal_p_val:.4f}, significant difference: {kruskal_p_val < P_VAL_THRESHOLD}")
+# Friedman test for all models
+friedman_stat, friedman_p_val = stats.friedmanchisquare(model_DMOS.set_index('model_name').loc['htdemucs']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_large']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_small']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_bigvgan']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['sgmsvs']['DMOS'].to_numpy())
+print(f"Friedman H-test: H={friedman_stat:.4f}, p={friedman_p_val:.4f}, significant difference: {friedman_p_val < P_VAL_THRESHOLD}")
 #create dataframe of metrics with same order as ratings_df
-if kruskal_p_val < P_VAL_THRESHOLD:
+if friedman_p_val < P_VAL_THRESHOLD:
     # perform post-hoc test with Dunn's test and Bonferroni correction
     data = np.concatenate((model_DMOS.set_index('model_name').loc['htdemucs']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_large']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_small']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['melroformer_bigvgan']['DMOS'].to_numpy(), model_DMOS.set_index('model_name').loc['sgmsvs']['DMOS'].to_numpy()))
     groups = ['htdemucs']*len(model_DMOS.set_index('model_name').loc['htdemucs']['DMOS'].to_numpy()) + ['melroformer_large']*len(model_DMOS.set_index('model_name').loc['melroformer_large']['DMOS'].to_numpy()) + ['melroformer_small']*len(model_DMOS.set_index('model_name').loc['melroformer_small']['DMOS'].to_numpy()) + ['melroformer_bigvgan']*len(model_DMOS.set_index('model_name').loc['melroformer_bigvgan']['DMOS'].to_numpy()) + ['sgmsvs']*len(model_DMOS.set_index('model_name').loc['sgmsvs']['DMOS'].to_numpy())
@@ -343,16 +346,16 @@ if kruskal_p_val < P_VAL_THRESHOLD:
                             'group': groups
                         })
 
-    dunn_results = sp.posthoc_dunn(data_df,val_col='dmos', group_col='group', p_adjust='bonferroni')
-    sig_diff_models = dunn_results < P_VAL_THRESHOLD
-    sig_diff_models_2 =dunn_results < P_VAL_THRESHOLD_2
-    sig_diff_models_3 = dunn_results < P_VAL_THRESHOLD_3
+    wilcoxon_results = sp.posthoc_wilcoxon(data_df, p_adjust='bonferroni', group_col='group', val_col='dmos')
+    sig_diff_models = wilcoxon_results < P_VAL_THRESHOLD
+    sig_diff_models_2 = wilcoxon_results < P_VAL_THRESHOLD_2
+    sig_diff_models_3 = wilcoxon_results < P_VAL_THRESHOLD_3
  #   sig_diff_models_4 = dunn_results < P_VAL_THRESHOLD_4
 
     print('---------------------------------------------------------------------------------------------------------------------------------------------------------')
-    print('----------------------------------------------------------Post-hoc Dunn\'s test Results------------------------------------------------------------------')
+    print('--------------------------------------------------------Post-hoc Wilcoxon\'s test Results----------------------------------------------------------------')
     print('---------------------------------------------------------------------------------------------------------------------------------------------------------')
-    print(dunn_results)
+    print(wilcoxon_results)
     print('Statistical significance of model pairs:')
     print('---------------------------------------------------------------------------------------------------------------------------------------------------------')
     print('p-val threshold: ' + str(P_VAL_THRESHOLD))
@@ -375,16 +378,16 @@ print('\n')
 
 #violin plot of DMOS ratings
 # Define significant pairs (p < 0.05)
-significant_pairs = [(('htdemucs', 'melroformer_small'), dunn_results['htdemucs']['melroformer_small']),
-                     (('htdemucs', 'melroformer_large'), dunn_results['htdemucs']['melroformer_large']),
-                     (('htdemucs', 'melroformer_bigvgan'), dunn_results['htdemucs']['melroformer_bigvgan']),
-                     (('htdemucs', 'sgmsvs'), dunn_results['htdemucs']['sgmsvs']),
-                     (('melroformer_small', 'melroformer_large'), dunn_results['melroformer_small']['melroformer_large']),
-                     (('melroformer_small', 'melroformer_bigvgan'), dunn_results['melroformer_small']['melroformer_bigvgan']),
-                     (('melroformer_small', 'sgmsvs'), dunn_results['melroformer_small']['sgmsvs']),
-                     (('melroformer_large', 'melroformer_bigvgan'), dunn_results['melroformer_large']['melroformer_bigvgan']),
-                     (('melroformer_large', 'sgmsvs'), dunn_results['melroformer_large']['sgmsvs']),
-                     (('melroformer_bigvgan', 'sgmsvs'), dunn_results['melroformer_bigvgan']['sgmsvs'])]
+significant_pairs = [(('htdemucs', 'melroformer_small'), wilcoxon_results['htdemucs']['melroformer_small']),
+                     (('htdemucs', 'melroformer_large'), wilcoxon_results['htdemucs']['melroformer_large']),
+                     (('htdemucs', 'melroformer_bigvgan'), wilcoxon_results['htdemucs']['melroformer_bigvgan']),
+                     (('htdemucs', 'sgmsvs'), wilcoxon_results['htdemucs']['sgmsvs']),
+                     (('melroformer_small', 'melroformer_large'), wilcoxon_results['melroformer_small']['melroformer_large']),
+                     (('melroformer_small', 'melroformer_bigvgan'), wilcoxon_results['melroformer_small']['melroformer_bigvgan']),
+                     (('melroformer_small', 'sgmsvs'), wilcoxon_results['melroformer_small']['sgmsvs']),
+                     (('melroformer_large', 'melroformer_bigvgan'), wilcoxon_results['melroformer_large']['melroformer_bigvgan']),
+                     (('melroformer_large', 'sgmsvs'), wilcoxon_results['melroformer_large']['sgmsvs']),
+                     (('melroformer_bigvgan', 'sgmsvs'), wilcoxon_results['melroformer_bigvgan']['sgmsvs'])]
 
 # Filter for pairs with significant p-values
 significant_pairs_1 = [pair[0] for pair in significant_pairs if pair[1] < P_VAL_THRESHOLD]
@@ -404,35 +407,36 @@ box_kwargs = dict(color='black', notch=True, bootstrap=5000, showfliers=False, s
 
 plt.figure(figsize=(8,5.5))
 fig=sns.violinplot(data=model_DMOS, x='model_name', y='DMOS', hue=model_DMOS['model_name'], order=model_order, inner=None, palette=[custom_color_palette[1],custom_color_palette[0],custom_color_palette[0],custom_color_palette[1],custom_color_palette[0]],saturation=0.7,cut=0,legend=False)
-# Annotate with statannotations
-offset = 0.15
-tick_dict = {}
-for tick in fig.get_xticklabels():
-    tick_dict[tick._text] = tick._x
-offset_ct = 1
-for pair,p_val in zip(significant_pairs_1, pval_1):
-    if pair == ('htdemucs', 'melroformer_small'):
-        pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
-        draw_significance_bar(fig, pair_num, 4.15, p_val, fontsize=10)
-    elif pair == ('melroformer_small', 'melroformer_large'):
-        pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
-        draw_significance_bar(fig, pair_num, 4.95, p_val, fontsize=10)
-    elif pair == ('melroformer_small', 'melroformer_bigvgan'):
-        pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
-        draw_significance_bar(fig, pair_num, 5.14, p_val, fontsize=10)
-    elif pair == ('htdemucs', 'melroformer_large'):
-        pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
-        draw_significance_bar(fig, pair_num, 5.32, p_val, fontsize=10)
-    elif pair == ('htdemucs', 'sgmsvs'):
-        pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
-        draw_significance_bar(fig, pair_num, 5.51, p_val, fontsize=10)
-    elif pair == ('htdemucs', 'melroformer_bigvgan'):
-        pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
-        draw_significance_bar(fig, pair_num, 5.7, p_val, fontsize=10)
-    else:
-        pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
-        draw_significance_bar(fig, pair_num, 5+offset*offset_ct, p_val, fontsize=10)
-        offset_ct += 1
+if PLOT_W_SIGNIFICANCE:
+    # Annotate with statannotations
+    offset = 0.15
+    tick_dict = {}
+    for tick in fig.get_xticklabels():
+        tick_dict[tick._text] = tick._x
+    offset_ct = 1
+    for pair,p_val in zip(significant_pairs_1, pval_1):
+        if pair == ('htdemucs', 'melroformer_small'):
+            pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
+            draw_significance_bar(fig, pair_num, 4.15, p_val, fontsize=10)
+        elif pair == ('melroformer_small', 'melroformer_large'):
+            pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
+            draw_significance_bar(fig, pair_num, 4.95, p_val, fontsize=10)
+        elif pair == ('melroformer_small', 'melroformer_bigvgan'):
+            pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
+            draw_significance_bar(fig, pair_num, 5.14, p_val, fontsize=10)
+        elif pair == ('htdemucs', 'melroformer_large'):
+            pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
+            draw_significance_bar(fig, pair_num, 5.32, p_val, fontsize=10)
+        elif pair == ('htdemucs', 'sgmsvs'):
+            pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
+            draw_significance_bar(fig, pair_num, 5.51, p_val, fontsize=10)
+        elif pair == ('htdemucs', 'melroformer_bigvgan'):
+            pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
+            draw_significance_bar(fig, pair_num, 5.7, p_val, fontsize=10)
+        else:
+            pair_num = (tick_dict[pair[0]], tick_dict[pair[1]])
+            draw_significance_bar(fig, pair_num, 5+offset*offset_ct, p_val, fontsize=10)
+            offset_ct += 1
 box_order = fig.get_xticklabels()
 #convert list of Text to list of strings
 box_order = [x._text for x in box_order]
@@ -444,8 +448,8 @@ plt.yticks(np.arange(1, 5.5, 0.5))
 plt.tight_layout()
 for i in range(len(box_fig.lines)):
     box_fig.lines[i].set_label(s=None)
-box_fig.lines[6].set_label('median')
-box_fig.lines[12].set_label('mean')
+box_fig.lines[6].set_label('mean')
+box_fig.lines[12].set_label('median')
 legend_handles = [
     box_fig.lines[6],
     box_fig.lines[12],
@@ -465,8 +469,10 @@ plt.legend(
 )
 
 if SAVE_FIGURES:
-    plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'violin_plot.pdf'), format='pdf', bbox_inches='tight')
-
+    if PLOT_W_SIGNIFICANCE:
+        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'violin_plot.pdf'), format='pdf', bbox_inches='tight')
+    else:
+        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'violin_plot_no_significance.pdf'), format='pdf', bbox_inches='tight')
 #correlation scatter plot
 metric_short_label_dict = {
                      'sar': 'SAR',
@@ -605,7 +611,7 @@ for metric_id, metric in enumerate(merged_srcc['metric']):
     elif metric in mse_metrics:
         marker_type = ref_marker_types[3]
         color = sns.color_palette('pastel')[0]
-        label = 'MSE'
+        label = 'embedding MSE'
         mse_ct += 1
         label_ct = mse_ct
     elif metric == 'visqol':
@@ -623,11 +629,16 @@ for metric_id, metric in enumerate(merged_srcc['metric']):
     else:
         assert False, 'metric not found in any category!'
 
-    sc=ax.scatter(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0], merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], color=color, edgecolor=[0.5,0.5,0.5], alpha=1, marker=marker_type, label=label if label_ct==1 else "",s=60)
-    if metric == 'sisdr' or metric == 'sdr'  or 'emb_mse_clap' in metric or metric == 'emb_mse_music2latent_df' or 'audiobox' in metric or metric == 'fad_individal_per_song_mert_df':
+    if metric == 'emb_mse_music2latent_df' or metric == 'emb_mse_mert_df':
+        ax.scatter(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0], merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], color=color, edgecolor=[1, 0.753, 0], alpha=1, marker=marker_type, label=label if label_ct==1 else "",s=150)
+    else:
+        sc=ax.scatter(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0], merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], color=color, edgecolor=[0.5,0.5,0.5], alpha=1, marker=marker_type, label=label if label_ct==1 else "",s=60)
+    if metric == 'sisdr' or metric == 'sdr'  or 'emb_mse_clap' in metric or metric == 'emb_mse_music2latent_df' or 'audiobox' in metric or metric == 'fad_individal_per_song_mert_df' or metric == 'emb_mse_mert_df':
         ax.text(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0]+white_space, merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], metric_short_label_dict[metric], fontsize=13, ha='left', va='top')  # Adjust alignment as needed
-    elif  metric == 'fad_song2song_clap_audio_df' or metric == 'fad_song2song_clap_music_df' :
-        ax.text(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0]-white_space, merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], metric_short_label_dict[metric], fontsize=13, ha='right', va='top')  # Adjust alignment as needed
+    elif metric == 'fad_song2song_clap_music_df' :
+        ax.text(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0]-white_space, merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], metric_short_label_dict[metric], fontsize=13, ha='right', va='bottom')  # Adjust alignment as needed
+    elif metric == 'fad_song2song_clap_audio_df' :
+        ax.text(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0]-white_space, merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0]-white_space*15, metric_short_label_dict[metric], fontsize=13, ha='right', va='bottom')  # Adjust alignment as needed
     elif metric == 'sar' or metric == 'isr'  or metric == 'fad_individal_per_song_clap_music_df':
         ax.text(merged_srcc[merged_srcc['metric']==metric]['corr_disc'].iloc[0]-white_space, merged_srcc[merged_srcc['metric']==metric]['corr_gen'].iloc[0], metric_short_label_dict[metric], fontsize=13, ha='right', va='bottom')  # Adjust alignment as needed
     else:
@@ -644,11 +655,25 @@ for metric_id, metric in enumerate(merged_srcc['metric']):
 
 rel_width = 0.2
 rel_height = 0.01
-first_legend = ax.legend(handles=ref_markers,loc='lower left', 
+#order legend chronologically after date of publication: 'BSS-Eval', 'PEASS', 'VISQOL', 'm.-res. loss', 'FAD_song2song', 'MSE'
+ref_legend_order = ['BSS-Eval', 'PEASS', 'VISQOL', 'm.-res. loss', '$\mathregular{FAD_{song2song}}$', 'embedding MSE']
+refless_legend_order = ['PAM', 'SINGMOS', 'XLS-R-SQA', 'Audiobox-AES']
+ref_legend_markers = []
+for ordered_label in ref_legend_order:
+    for marker in ref_markers:
+        if marker.get_label() == ordered_label:
+            ref_legend_markers.append(marker)
+refless_legend_markers = []
+for ordered_label in refless_legend_order:
+    for marker in refless_markers:
+        if marker.get_label() == ordered_label:
+            refless_legend_markers.append(marker)
+
+first_legend = ax.legend(handles=ref_legend_markers,loc='lower left', 
                          alignment='left', title="Intrusive Metrics\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u2009\u2009", title_fontproperties={'weight': 'bold', 'size': 13},
                          bbox_to_anchor =(1, 0.4, rel_width, rel_height),fontsize=13, borderpad=0.3, labelspacing=0.2, handlelength=1.5, handletextpad=0.3)
 ax.add_artist(first_legend)
-second_legend = ax.legend(handles=refless_markers,loc='upper left', 
+second_legend = ax.legend(handles=refless_legend_markers,loc='upper left', 
                           alignment='left', title="Non-intrusive Metrics", title_fontproperties={'weight': 'bold', 'size': 13},
                           bbox_to_anchor =(1, 0.4, rel_width, rel_height), fontsize=13, borderpad=0.3, labelspacing=0.2, handlelength=1.5, handletextpad=0.3)#                          borderaxespad=0, frameon=True)
 ax.set_yticks(np.arange(-0.1,0.9,0.1))
@@ -657,8 +682,8 @@ ax.set_ylabel('$\mathregular{SRCC_{gen}}$')
 ax.tick_params(axis='y',labelsize=14)
 plt.tight_layout()
 if SAVE_FIGURES:
-        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.pdf'), format='pdf', bbox_inches='tight')
-        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.png'), format='png',dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff_correct.pdf'), format='pdf', bbox_inches='tight')
+        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff_correct.png'), format='png',dpi=300, bbox_inches='tight')
 
 
 
