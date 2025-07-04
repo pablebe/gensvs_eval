@@ -1,5 +1,7 @@
 # Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation
 This repository accompanies the submission titled "Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation".
+Paper: <URL>
+Companion Page: https://pablebe.github.io/gensvs_eval_companion_page/ 
 
 ## 🚀 Getting Started
 To run all of the code in this repository we recommend setting up the following 5 conda environments.  
