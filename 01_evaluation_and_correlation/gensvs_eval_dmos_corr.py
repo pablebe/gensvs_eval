@@ -682,8 +682,8 @@ ax.set_ylabel('$\mathregular{SRCC_{gen}}$')
 ax.tick_params(axis='y',labelsize=14)
 plt.tight_layout()
 if SAVE_FIGURES:
-        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff_correct.pdf'), format='pdf', bbox_inches='tight')
-        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff_correct.png'), format='png',dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.pdf'), format='pdf', bbox_inches='tight')
+        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.png'), format='png',dpi=300, bbox_inches='tight')
 
 
 
