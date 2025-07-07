@@ -399,7 +399,7 @@ significant_pairs_3 = [pair[0] for pair in significant_pairs if pair[1] < P_VAL_
 print("Significant Pairs (p <  "+str(P_VAL_THRESHOLD_3)+"): ", significant_pairs_3)
 
 
-model_names_xticks = ['HTDemucs', 'Mel-RoFo. (S)', 'Mel-RoFo. (L)', 'SGMSVS', 'Mel-RoFo. (S) + BigVGAN']
+model_names_xticks = ['HTDemucs', 'MelRoFo (S)', 'MelRoFo (L)', 'SGMSVS', 'MelRoFo (S) + BigVGAN']
 alpha=0.85
 custom_color_palette = sns.color_palette("pastel")[:len(model_DMOS['model_name'].unique())]#sns.color_palette("pastel")[:len(violin_data['model_name'].unique())]
 custom_color_pallette = [color+(alpha,) for color in custom_color_palette]
@@ -510,7 +510,7 @@ metric_short_label_dict = {
                      'emb_mse_mert_df': 'M-L12$^*$',
                      'emb_mse_music2latent_df': 'M2L$^*$',
                      'visqol': 'ViSQOL',
-                     'multi_res_loss': 'm.-res. loss',
+                     'multi_res_loss': '$\mathcal{L}_{\mathregular{MR}}$',#'m.-res. loss',
                      'pam': 'PAM',
                      'meta_audiobox_aes_PQ': 'PQ',
                      'meta_audiobox_aes_CU': 'CU',
@@ -623,7 +623,7 @@ for metric_id, metric in enumerate(merged_srcc['metric']):
     elif metric == 'multi_res_loss':
         marker_type = ref_marker_types[5]
         color =sns.color_palette('pastel')[0]
-        label = 'm.-res. loss'
+        label = '$\mathcal{L}_{\mathregular{MR}}$'#'m.-res. loss'
         mres_ct += 1
         label_ct = mres_ct
     else:
@@ -656,7 +656,7 @@ for metric_id, metric in enumerate(merged_srcc['metric']):
 rel_width = 0.2
 rel_height = 0.01
 #order legend chronologically after date of publication: 'BSS-Eval', 'PEASS', 'VISQOL', 'm.-res. loss', 'FAD_song2song', 'MSE'
-ref_legend_order = ['BSS-Eval', 'PEASS', 'VISQOL', 'm.-res. loss', '$\mathregular{FAD_{song2song}}$', 'embedding MSE']
+ref_legend_order = ['BSS-Eval', 'PEASS', 'VISQOL', '$\mathcal{L}_{\mathregular{MR}}$', '$\mathregular{FAD_{song2song}}$', 'embedding MSE']
 refless_legend_order = ['PAM', 'SINGMOS', 'XLS-R-SQA', 'Audiobox-AES']
 ref_legend_markers = []
 for ordered_label in ref_legend_order:
