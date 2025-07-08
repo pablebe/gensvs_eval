@@ -518,8 +518,8 @@ metric_short_label_dict = {
                      'meta_audiobox_aes_PQ_ref_norm': 'PQ_{ref}',
                      'meta_audiobox_aes_CU_ref_norm': 'CU_{ref}',
                      'meta_audiobox_aes_CE_ref_norm': 'CE_{ref}',
-                     'singmos': 'SINGMOS',
-                     'singmos_ref_norm': 'SINGMOS_{ref}',
+                     'singmos': 'SingMOS',
+                     'singmos_ref_norm': 'SingMOS_{ref}',
                      'xls_r_sqa_full': 'XLS-R-SQA (Full)',
                      'xls_r_sqa': 'XLS-R-SQA',
                      'xls_r_sqa_ref_norm': 'XLS-R-SQA_{ref}',             
@@ -592,7 +592,7 @@ for metric_id, metric in enumerate(merged_srcc['metric']):
     elif metric in singmos_metrics:
         marker_type = ref_less_marker_types[2]
         color = sns.color_palette('pastel')[1]
-        label = 'SINGMOS'
+        label = 'SingMOS'
         singmos_ct += 1
         label_ct = singmos_ct
 
@@ -657,7 +657,7 @@ rel_width = 0.2
 rel_height = 0.01
 #order legend chronologically after date of publication: 'BSS-Eval', 'PEASS', 'VISQOL', 'm.-res. loss', 'FAD_song2song', 'MSE'
 ref_legend_order = ['BSS-Eval', 'PEASS', 'VISQOL', '$\mathcal{L}_{\mathregular{MR}}$', '$\mathregular{FAD_{song2song}}$', 'embedding MSE']
-refless_legend_order = ['PAM', 'SINGMOS', 'XLS-R-SQA', 'Audiobox-AES']
+refless_legend_order = ['PAM', 'SingMOS', 'XLS-R-SQA', 'Audiobox-AES']
 ref_legend_markers = []
 for ordered_label in ref_legend_order:
     for marker in ref_markers:
