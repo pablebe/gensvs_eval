@@ -3,9 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import glob
 import os
-#import pyaml
 import matplotlib
-import scipy.stats
 import seaborn as sns
 from matplotlib.patches import Patch
 from sklearn.preprocessing import PowerTransformer, QuantileTransformer
@@ -21,14 +19,14 @@ matplotlib.rcParams['legend.fontsize'] = 11  # Set legend font size
 SAVE_FIGURES = True
 PLOT_W_SIGNIFICANCE = False
 
-RATINGS_PATH = './04_evaluation_data/dcr_test_ratings.csv'
+RATINGS_PATH = './03_evaluation_data/dcr_test_ratings.csv'
 METRICS_PATH = './01_evaluation_and_correlation/evaluation_metrics'
 METRICS_FILE_ORDER = os.path.join(METRICS_PATH,'file_id_order.csv')
-OUT_PATH = './04_evaluation_data'
+OUT_PATH = './03_evaluation_data'
 os.makedirs(OUT_PATH, exist_ok=True)
 os.makedirs(os.path.join(OUT_PATH, 'figures'), exist_ok=True)
 
-ALL_METRICS_OUTPATH = './04_evaluation_data'
+ALL_METRICS_OUTPATH = './03_evaluation_data'
 P_VAL_THRESHOLD = 0.05
 P_VAL_THRESHOLD_2 = 0.01
 P_VAL_THRESHOLD_3 = 0.001
@@ -105,6 +103,39 @@ for metric_file in metric_files:
 #save metrics to dataframe
 metric_df_2_save = metrics_df.copy()
 metric_df_2_save.to_csv(os.path.join(OUT_PATH, 'all_metrics_df.csv'), index=False)
+
+#merge two dataframes
+metrics_and_ratings_df = ratings_df.copy()
+metrics_and_ratings_df = metrics_and_ratings_df.merge(metrics_df, on=['trial_uid', 'file_id', 'model_name'], how='right')
+column_list = ['filepath','file_id', 'trial_id', 'group_id', 'model_type']+metrics_and_ratings_df.columns[4:].to_list()
+csv_out = pd.DataFrame(columns = column_list)
+
+generartive_models = ['sgmsvs', 'melroformer_bigvgan']
+discriminative_models = ['melroformer_small', 'melroformer_large', 'htdemucs']
+for csv_df_row in metrics_and_ratings_df.iterrows():
+    #parse trial_uid in group_uid and trial_id and insert them as new columns
+    group_id = 'group'+csv_df_row[1]['trial_uid'].split('group')[-1][0]
+    trial_id = 'trial'+csv_df_row[1]['trial_uid'].split('trial')[-1][1:]
+    
+    row_df_append = csv_df_row[1][1:]
+    
+    # insert group and trial_id as new columns
+    row_df_append['group_id'] = group_id
+    row_df_append['trial_id'] = trial_id
+    row_df_append['filepath'] = '.'+os.path.sep+'audio'+os.path.sep+row_df_append['model_name']+os.path.sep+'separated_vocals_'+row_df_append['file_id']+'.wav'
+    row_df_append['model_type'] = 'generative' if row_df_append['model_name'] in generartive_models else 'discriminative'
+    
+    #reorder according to column_list
+    order_idx = row_df_append.index.to_list()
+    column_order = [order_idx.index(col) for col in column_list]
+    column_order.insert(0, 0)  # keep filepath as first column
+    row_df_append = row_df_append.iloc[column_order]#.str.replace(',', '.', regex=False).astype(float)
+    #append row to csv_out dataframe
+    csv_out =  csv_out._append(row_df_append.to_dict(),ignore_index=True)
+    
+#save csv_out to folder_path
+csv_out.to_csv(os.path.join(OUT_PATH,'gensvs_eval_data.csv'), index=False)
+
 
 ## Shapiro-Wilk to check for normality in test groups for generative, discriminative and individual models
 model_order = ['htdemucs', 'melroformer_small', 'melroformer_large', 'sgmsvs', 'melroformer_bigvgan']
@@ -289,11 +320,11 @@ corr_df_discriminative = pd.DataFrame(columns=['metric', 'pearson_correlation', 
 corr_df_generative = pd.DataFrame(columns=['metric', 'pearson_correlation', 'p_val_pearson', 'linear_relation_by_pearson', 'spearman_correlation', 'p_val_spearman', 'monotonic_relation_by_spearman'])
 for metric in metric_names:
     #calculate correlation for discriminative models
-    corr_pearson_disc, p_val_pear_disc = scipy.stats.pearsonr(dmos_df_discriminative['DMOS'].to_numpy().astype('float64'), metrics_df_discriminative[metric].to_numpy().astype('float64'))
-    corr_spear_disc, p_val_spear_disc = scipy.stats.spearmanr(dmos_df_discriminative['DMOS'].to_numpy().astype('float64'), metrics_df_discriminative[metric].to_numpy().astype('float64'))
+    corr_pearson_disc, p_val_pear_disc = stats.pearsonr(dmos_df_discriminative['DMOS'].to_numpy().astype('float64'), metrics_df_discriminative[metric].to_numpy().astype('float64'))
+    corr_spear_disc, p_val_spear_disc = stats.spearmanr(dmos_df_discriminative['DMOS'].to_numpy().astype('float64'), metrics_df_discriminative[metric].to_numpy().astype('float64'))
     #calculate correlation for generative models
-    corr_pearson_gen, p_val_pear_gen = scipy.stats.pearsonr(dmos_df_generative['DMOS'].to_numpy().astype('float64'), metrics_df_generative[metric].to_numpy().astype('float64'))
-    corr_spear_gen, p_val_spear_gen = scipy.stats.spearmanr(dmos_df_generative['DMOS'].to_numpy().astype('float64'), metrics_df_generative[metric].to_numpy().astype('float64'))
+    corr_pearson_gen, p_val_pear_gen = stats.pearsonr(dmos_df_generative['DMOS'].to_numpy().astype('float64'), metrics_df_generative[metric].to_numpy().astype('float64'))
+    corr_spear_gen, p_val_spear_gen = stats.spearmanr(dmos_df_generative['DMOS'].to_numpy().astype('float64'), metrics_df_generative[metric].to_numpy().astype('float64'))
 
     if 'multi_res' in metric or 'fad' in metric or 'mse' in metric or 'kad' in metric:
         corr_pearson_disc *=-1

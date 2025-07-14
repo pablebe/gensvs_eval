@@ -1,43 +1,18 @@
 # Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation
 This repository accompanies the submission titled "Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation".
+For audio examples and further information please visit our companion page (see link below)!
 
 Paper: <URL>
 
 Companion Page: https://pablebe.github.io/gensvs_eval_companion_page/ 
 
-## 🚀 Getting Started
+DMOS Data, Audio File & Metrics: <URL>
+
+## 🚀 Getting Started: Conda Environment Setup
 To run all of the code in this repository we recommend setting up the following 5 conda environments.  
 Environments I-III are necessary to infer and train all models mentioned in the paper and environments IV-V are necessary to reproduce the evaluation and correlation analysis outlined in the paper. 
 
-### I. Conda environment for training and inference of **HTDemucs** and **Mel-RoFo. (S)** (```gensvs_eval_baseline_env```):
-1. Create the conda environment:  
-```$ conda env create -f ./env_info/mss_baseline_env_conda.yml```  
-2. Install additional python dependencies:  
-```$ pip install -r ./env_info/mss_baseline_env_requirements.txt```
-
-### II. Conda environment for training and inference of **SGMSVS** model (```gensvs_eval_sgmsvs_env```):
-1. Set the ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where the CUDA toolkit is installed. This can be the path where conda environment will be located
-2. Create the conda environment:   
-```$ conda env create -f ./env_info/sgmsvs_env_conda.yml```
-3. Install additional python dependencies:  
-```$ pip install -r ./env_info/sgmsvs_env.txt```
-
-### III. Conda environment for training/finetuning and inference of **Mel-RoFo. (S)+BigVGAN** (```gensvs_eval_bigvgan_env```):
-1. Set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
-2. Create the conda environment:  
-```$ conda env create -f ./env_info/bigvgan_env.yml```
-3. Install additional python dependencies:  
-```$ pip install -r ./env_info/bigvgan_env_requirements.txt```
-
-### IV. Conda environment for evaluation of FAD and MSE metrics (```gensvs_fad_mse_eval_env```):
-For evaluating the model's performance using the proposed FAD and MSE evaluation metrics an additional conda environment has to be set up. This conda envirnonment builds on Microsoft's Frechet Audio Distance Toolkit [5].
-1. Create the conda environment:
-```$ conda env create -f ./env_info/svs_fad_mse_eval_env.yml``` 
-2. Install additional python dependencies:
-```$ pip install -r ./env_info/svs_fad_mse_eval_env.txt```  
-3. Test fadtk installation with: ```$ python -m fadtk.test```
-
-### V. Conda environment for evaluation of other metrics and correlation analysis (```gensvs_eval_env```)
+### I. ```gensvs_eval_env```: Conda environment for evaluation of other metrics and correlation analysis
 For evaluating the model's performance using the objective evaluation metrics and reproduce the correlation analysis of the paper we recommend setting up an additional conda environment with:
 1. Create the conda environment:  
 ```$ ./env_info/svs_eval_env.yml``` 
@@ -47,65 +22,35 @@ For evaluating the model's performance using the objective evaluation metrics an
 3. Build the ViSQOL API according to instructions of https://github.com/google/visqol and place within folder within root directory
    - **Note:** URL and SHA256 of Armadillo headers in WORKSPACE file need to be changed to a recent version (https://sourceforge.net/projects/arma/files/)
 
+In addition to the dependencies the ViSQOL v3 command-line tool and a running Matlab (version<2025a) installation is required.
 
-In addition to the dependencies the ViSQOL API (run through command line) and a running Matlab (version<2025a) installation is required.
-## 🏋🏽‍♀️🏃🏽‍♀️‍➡️ Training and Inference
-The folder ```00_training_and_inference``` contains all code required to carry out training and inference for all the models mentioned in the paper. 
+### II. ```gensvs_fad_mse_eval_env```: Conda environment for evaluation of FAD and MSE metrics
+For evaluating the model's performance using the proposed FAD and MSE evaluation metrics an additional conda environment has to be set up. This conda envirnonment builds on Microsoft's Frechet Audio Distance Toolkit [5].
+1. Create the conda environment:
+```$ conda env create -f ./env_info/svs_fad_mse_eval_env.yml``` 
+2. Install additional python dependencies:
+```$ pip install -r ./env_info/svs_fad_mse_eval_env.txt```  
+3. Test fadtk installation with: ```$ python -m fadtk.test```
 
-### Trained models
- - HTDemucs, Mel-Rofo. (S), SGMSVS and the finetuned BigVGAN checkpoints (generator and discriminator) can be downloaded here: https://drive.google.com/drive/folders/13D_0ciDODkNv9q5W9l2s2WsmpHlZJvnS?usp=sharing  
- - The model checkpoint for Mel-Rofo. (L) can be downloaded from [3].
+### III. ```gensvs_eval_baseline_env```: Conda environment for training and inference of **HTDemucs** and **MelRoFo (S)** 
+1. Create the conda environment:  
+```$ conda env create -f ./env_info/mss_baseline_env_conda.yml```  
+2. Install additional python dependencies:  
+```$ pip install -r ./env_info/mss_baseline_env_requirements.txt```
 
-### Inference
-To run all models mentioned in the paper on a folder of musical mixtures you can either use the python inference scripts or use the provided bash scripts which show how to call the python scripts:
-#### Discriminative baseline models: HTDemucs, Mel-RoFo. (S) & Mel-RoFo. (L)
-To run the mask-based baseline models on a folder of musical mixtures the following scripts can be used:  
-- Python:
-  - HTDemucs & Mel-RoFo. (S): ```00_training_and_inference/inference_baseline.py```  
-  - Mel-RoFo. (L): ```00_training_and_inference/inference_melroformer_large.py```  
-- Bash:
-  - HTDemucs: ```$ 00_training_and_inference/infer_htdemucs.sh```
-  - Mel-RoFo. (S):```$ 00_training_and_inference/infer_melroformer_small.sh``` 
-  - Mel-RoFo. (L): ```$ 00_training_and_inference/infer_melroformer_large.sh```
+### IV. ```gensvs_eval_sgmsvs_env```: Conda environment for training and inference of **SGMSVS** model
+1. Set the ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where the CUDA toolkit is installed. This can be the path where conda environment will be located
+2. Create the conda environment:   
+```$ conda env create -f ./env_info/sgmsvs_env_conda.yml```
+3. Install additional python dependencies:  
+```$ pip install -r ./env_info/sgmsvs_env.txt```
 
-- Required Conda environment:
-   - I. ```gensvs_eval_baseline_env```
-
-#### Generative models: SGMSVS & Mel-RoFo. (S) + BigVGAN
-
-To run the generative models on a folder of musical mixtures the following scripts can be used:  
-- Python: 
-  - SGMSVS: ```00_training_and_inference/inference_sgmsvs.py```
-  - Mel-RoFo. (S) + BigVGAN: ```00_training_and_inference/inference_melroformer_small_bigvgan.py```
-- Bash:
-  - SGMSVS: ```$ 00_training_and_inference/infer_sgmsvs.sh```
-  - Mel-RoFo. (S) + BigVGAN: ```00_training_and_inference/infer_melroformer_small_bigvgan.sh```
-- Required Conda environment:
-   - SGMSVS: II. ```gensvs_eval_sgmsvs_env```
-   - Mel-RoFo. (S) + BigVGAN: III. ```gensvs_eval_bigvgan_env```
-### Training
-Below the python training scripts and example bash scripts are listed for all models to reproduce all trainings and the set parameters mentioned in the paper:
-#### Discriminative Baselines: HTDemucs & Mel-RoFo (S)
-To train the dicriminative mask-based baselines use:
-  - Python:
-    - HTDemucs & Mel-RoFo. (S): ```00_training_and_inference/train_baseline.py```
-  - Bash: 
-    - HTDemucs: ```$ 00_training_and_inference/train_htdemucs.sh```
-    - Mel-RoFo. (S): ```$ 00_training_and_inference/train_melroformer.sh```
-#### Generative models: SGMSVS & Mel-RoFo. (S) + BigVGAN
-To train the SGMSVS model or task-specifically finetune BigVGAN for singing voice separation with Mel-RoFo. (S) you can use:
-
-- Python: 
-   - SGMSVS: ```00_training_and_inference/train_sgmsvs.py```
-   - Mel-RoFo. (S) + BigVGAN: ```00_training_and_inference/train_finetune_bigvgan.py```
-- Bash: 
-   - SGMSVS: ```$ 00_training_and_inference/train_sgmsvs.sh```
-   - Mel-RoFo. (S) + BigVGAN: ```$ 00_training_and_inference/train_bigvgan.sh```
-
-- Required Conda environments:
-   - SGMSVS: II. ```gensvs_eval_sgmsvs_env```
-   - Mel-RoFo. (S) + BigVGAN: III. ```gensvs_eval_bigvgan_env```
-
+### V. ```gensvs_eval_bigvgan_env```: Conda environment for training/finetuning and inference of **MelRoFo (S)+BigVGAN**
+1. Set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
+2. Create the conda environment:  
+```$ conda env create -f ./env_info/bigvgan_env.yml```
+3. Install additional python dependencies:  
+```$ pip install -r ./env_info/bigvgan_env_requirements.txt```
 
 ## 🧮 Evaluation and Correlation Analysis
 <img src="./04_evaluation_data/figures/gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="100%">  
@@ -127,27 +72,83 @@ The metrics can be computed with a python script. To show how the evaluation scr
 - Python: ```./01_evaluation_and_correlation/gensvs_eval_fad_mse.py```
 - Bash: ```$ ./01_evaluation_and_correlation/gensvs_eval_fad_mse.sh```
 - Required Conda environments:
-   - IV. ```gensvs_fad_mse_eval_env```
+   - II. ```gensvs_fad_mse_eval_env```
 #### Compute PAM scores
 To compute the PAM scores of https://github.com/soham97/PAM please use the following scripts:
 - Python: ```./01_evaluation_and_correlation/gensvs_eval_pam.py```
 - Bash: ```$ 01_evaluation_and_correlation/gensvs_eval_pam.sh```
 - Required Conda environments:
-   - V. ```gensvs_eval_env```
+   - I. ```gensvs_eval_env```
 #### Compute all other non-intrusive and intrusive metrics (BSS-Eval, PEASS, SINGMOS, XLS-R-SQA, Audiobox-AES)
 To compute all other metrics mentioned in the paper please use
 - Python: ```./01_evaluation_and_correlation/gensvs_eval_metrics.py```
 - Bash: ```$ ./01_evaluation_and_correlation/gensvs_eval_metrics.sh```
 - Required Conda environments:
-   - V. ```gensvs_eval_env```
+   - I. ```gensvs_eval_env```
 ### Subjective Evaluation and correlation analysis
 In order to evaluate the DMOS data and reproduce the correlation analysis results, the python script can be executed under:
 - Python: ```./01_evaluation_and_correlation/gensvs_eval_dmos_corr.py```
 - Required Conda environments:
-   - V. ```gensvs_eval_env```
-## 🎼 Audio Examples
-In the folder ```03_audio_examples``` 12 audio examples of each model can be found.  
-The audio examples are mono and loudness normalized to -18 dBFS according to EBU R128.
+   - I. ```gensvs_eval_env```
+
+## 🏋🏽‍♀️🏃🏽‍♀️‍➡️ Training and Inference
+The folder ```00_training_and_inference``` contains all code required to carry out training and inference for all the models mentioned in the paper. 
+
+### Trained models
+ - HTDemucs, MelRoFo (S), SGMSVS and the finetuned BigVGAN checkpoints (generator and discriminator) can be downloaded here: https://drive.google.com/drive/folders/13D_0ciDODkNv9q5W9l2s2WsmpHlZJvnS?usp=sharing  
+ - The model checkpoint for MelRoFo (L) can be downloaded from [3].
+
+### Inference
+To run all models mentioned in the paper on a folder of musical mixtures you can either use the python inference scripts or use the provided bash scripts which show how to call the python scripts:
+#### Discriminative baseline models: HTDemucs, MelRoFo (S) & MelRoFo (L)
+To run the mask-based baseline models on a folder of musical mixtures the following scripts can be used:  
+- Python:
+  - HTDemucs & MelRoFo (S): ```00_training_and_inference/inference_baseline.py```  
+  - MelRoFo (L): ```00_training_and_inference/inference_melroformer_large.py```  
+- Bash:
+  - HTDemucs: ```$ 00_training_and_inference/infer_htdemucs.sh```
+  - MelRoFo (S): ```$ 00_training_and_inference/infer_melroformer_small.sh``` 
+  - MelRoFo (L): ```$ 00_training_and_inference/infer_melroformer_large.sh```
+
+- Required Conda environment:
+   - III. ```gensvs_eval_baseline_env```
+
+#### Generative models: SGMSVS & MelRoFo (S) + BigVGAN
+
+To run the generative models on a folder of musical mixtures the following scripts can be used:  
+- Python: 
+  - SGMSVS: ```00_training_and_inference/inference_sgmsvs.py```
+  - MelRoFo (S) + BigVGAN: ```00_training_and_inference/inference_melroformer_small_bigvgan.py```
+- Bash:
+  - SGMSVS: ```$ 00_training_and_inference/infer_sgmsvs.sh```
+  - MelRoFo (S) + BigVGAN: ```00_training_and_inference/infer_melroformer_small_bigvgan.sh```
+- Required Conda environment:
+   - SGMSVS: IV. ```gensvs_eval_sgmsvs_env```
+   - MelRoFo (S) + BigVGAN: V. ```gensvs_eval_bigvgan_env```
+### Training
+Below the python training scripts and example bash scripts are listed for all models to reproduce all trainings and the set parameters mentioned in the paper:
+#### Discriminative Baselines: HTDemucs & MelRoFo (S)
+To train the dicriminative mask-based baselines use:
+  - Python:
+    - HTDemucs & MelRoFo (S): ```00_training_and_inference/train_baseline.py```
+  - Bash: 
+    - HTDemucs: ```$ 00_training_and_inference/train_htdemucs.sh```
+    - MelRoFo (S): ```$ 00_training_and_inference/train_melroformer.sh```
+  - Required Conda environment:
+    - III. ```gensvs_eval_baseline_env```
+#### Generative models: SGMSVS & MelRoFo (S) + BigVGAN
+To train the SGMSVS model or task-specifically finetune BigVGAN for singing voice separation with MelRoFo (S) you can use:
+
+- Python: 
+   - SGMSVS: ```00_training_and_inference/train_sgmsvs.py```
+   - MelRoFo (S) + BigVGAN: ```00_training_and_inference/train_finetune_bigvgan.py```
+- Bash: 
+   - SGMSVS: ```$ 00_training_and_inference/train_sgmsvs.sh```
+   - MelRoFo (S) + BigVGAN: ```$ 00_training_and_inference/train_bigvgan.sh```
+
+- Required Conda environments:
+   - SGMSVS: II. ```gensvs_eval_sgmsvs_env```
+   - MelRoFo (S) + BigVGAN: III. ```gensvs_eval_bigvgan_env```
 
 ## Third-party code
 All third-party code is contained in separate folders, each of which is specifically listed in this README.md file, if there exist LICENSE files for these third party folders they are located within their respective directories. The third-party directories are:
