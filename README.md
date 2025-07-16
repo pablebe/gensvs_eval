@@ -8,8 +8,8 @@ This repository contains the code accompanying the WASPAA 2025 paper "Towards Re
 
 
 ## 📈 Benchmark you own metrics
-A simple Python script to benchmark objective metrics on our DMOS data using the correlation analysis of the paper is included in the Zenodo dataset available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723).<br>
-Within the Readme.md of the dataset you'll find instructions on how to benchmark you own audio quality metrics on our DMOS data.
+A simple Python script to benchmark objective metrics on our DMOS data using the paper's correlation analysis is included in the Zenodo dataset available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723).<br>
+Instructions for benchmarking your own audio quality metrics are provided in the dataset’s Readme.md file.
 
 ## 🚀 Getting Started: Conda Environment Setup
 >**Note**: If you are only interested in using our DMOS data, or if you want to benchmark your metric against it, you don't need to install any environments, just follow the instructions included in the Zenodo dataset linked above.<br>
