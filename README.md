@@ -60,8 +60,7 @@ For evaluating the model's performance using the proposed FAD and MSE evaluation
 
 Within the folder ```01_evaluation_and_correlation``` all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
 
-All metrics, listening test results, DMOS ratings, and the audio used for both metric computation and loudness-normalized listening tests are available on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723). A single CSV file combines all computed metrics, DMOS ratings, and individual ratings for each audio sample. The repository also includes instructions and an example Python script to help you benchmark your own audio quality metric by calculating correlation coefficients on our dataset. If you are only interested in the final data, you can ignore the individual .csv files located in the ```./04_evaluation_data``` folder, as they reflect intermediate steps during the paper’s development.
-
+All metrics, listening test results, DMOS ratings, and the audio used for both metric computation and loudness-normalized listening tests are available on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723), where a single CSV file combines all computed metrics, DMOS ratings, and individual ratings for each audio sample. The dataset also includes instructions and an example Python script to help you benchmark your own audio quality metric by calculating correlation coefficients on our dataset. If you are only interested in the final data, you can ignore the individual CSV files located in the ```./04_evaluation_data``` folder, as they reflect intermediate steps during the paper’s development.
 
 ### Reproduce the evaluation carried out in the paper 
 If you really want to look into how we calculated all metrics follow the steps below: 
