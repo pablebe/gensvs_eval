@@ -8,26 +8,26 @@ This repository contains the code accompanying the WASPAA 2025 paper "Towards Re
 
 
 ## 📈 Benchmark you own metrics
-A simple Python script to benchmark objective metrics on our DMOS data is included in the zenodo dataset available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723).<br>
+A simple Python script to benchmark objective metrics on our DMOS data using the correlation analysis of the paper is included in the Zenodo dataset available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723).<br>
 Within the Readme.md of the dataset you'll find instructions on how to benchmark you own audio quality metrics on our DMOS data.
 
 ## 🚀 Getting Started: Conda Environment Setup
+>**Note**: If you are only interested in using our DMOS data, or if you want to benchmark your metric against it, you don't need to install any environments, just follow the instructions included in the Zenodo dataset linked above.<br>
+
 To run all of the code in this repository we recommend setting up the following 5 conda environments.  
 Environments I-III are necessary to reproduce the evaluation and correlation analysis outlined in the paper and environments IV-V are necessary to infer and train all models.
-
-### I. ```gensvs_eval_env```: Conda environment for evaluation of other metrics and correlation analysis
-For evaluating the model's performance using the objective evaluation metrics and reproduce the correlation analysis of the paper we recommend setting up an additional conda environment with:
+### I. ```gensvs_eval_env```: Conda environment for computation intrusive and non-intrusive metrics and correlation analysis
+For evaluating the model's performance using the intrusive and non-intrusive metrics of the paper, as well as exporting all plots and the *.csv-files of the paper. We recommend setting up an additional conda environment with:
 1. Create the conda environment:  
 ```$ ./env_info/svs_eval_env.yml``` 
 
 2. Install additional python dependencies:  
 ```$ ./env_info/svs_eval_env.txt```
-3. Build the ViSQOL API according to instructions of https://github.com/google/visqol and place within folder within root directory
-   - **Note:** URL and SHA256 of Armadillo headers in WORKSPACE file need to be changed to a recent version (https://sourceforge.net/projects/arma/files/)
+3. Build the ViSQOL API according to instructions of https://github.com/google/visqol and place in folder within the root directory
+   - >**Note:** URL and SHA256 of Armadillo headers in the file "WORKSPACE" need to be changed to a recent version (https://sourceforge.net/projects/arma/files/)
+4. To compute metrics with the PEASS-toolkit in the folder ```./01_evaluation_and_correlation/peass_v2.0.1``` Matlab (version<2025a) is required to execute Python's Matlab engine   
 
-In addition to the dependencies the ViSQOL v3 command-line tool and a running Matlab (version<2025a) installation is required.
-
-### II. ```gensvs_fad_mse_eval_env```: Conda environment for evaluation of FAD and MSE metrics
+### II. ```gensvs_fad_mse_eval_env```: Conda environment for evaluation intrusive embedding-based metrics
 For evaluating the model's performance using the proposed FAD and MSE evaluation metrics an additional conda environment has to be set up. This conda envirnonment builds on Microsoft's Frechet Audio Distance Toolkit [5].
 1. Create the conda environment:
 ```$ conda env create -f ./env_info/svs_fad_mse_eval_env.yml``` 
@@ -60,14 +60,11 @@ For evaluating the model's performance using the proposed FAD and MSE evaluation
 
 Within the folder ```01_evaluation_and_correlation``` all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
 
+All metrics, listening test results, DMOS ratings, and the audio used for both metric computation and loudness-normalized listening tests are available on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723). A single CSV file combines all computed metrics, DMOS ratings, and individual ratings for each audio sample. The repository also includes instructions and an example Python script to help you benchmark your own audio quality metric by calculating correlation coefficients on our dataset. If you are only interested in the final data, you can ignore the individual .csv files located in the ```./04_evaluation_data``` folder, as they reflect intermediate steps during the paper’s development.
 
 
 ### Reproduce the evaluation carried out in the paper 
-All objective metrics are collected in a single file in ```./04_evaluation_data/all_metrics_df.csv``` and can be found individually in the folder ```./01_evaluation_and_correlation/evaluation_metrics```.   
-The DMOS data can be found in ```./04_evaluation_data/dmos_ratings.csv```  
-The raw listening test data including all the individual ratings can be found in ```./04_evaluation_data/dcr_test_ratings.csv```  
->Note: To evaluate all models and reproduce the results from the paper, the whole MUSDB18-HQ test-set needs to be processed with each model using the inference scripts. Or the processed audio files can be downloaded from: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723)
-
+If you really want to look into how we calculated all metrics follow the steps below: 
 
 ### Compute Objective Evaluation Metrics
 To calculate all objective metrics mentioned in the paper three python scripts are necessary. The evaluation of PAM as well as the FAD & MSE metrics are carried out in separate scripts. For the computation of the FAD & MSE metrics the conda environment ```gensvs_fad_mse_eval_env``` is necessary. All other metrics can be computed with the ```gensvs_eval_env```.
@@ -161,6 +158,7 @@ All third-party code is contained in separate folders, each of which is specific
 
 - ```./00_training_and_inference/sgmsvs/sgmse``` (from [1] https://github.com/sp-uhh/sgmse)
 - ```./01_evaluation_and_correlation/pam_eval``` (from https://github.com/soham97/PAM)
+- ```./01_evaluation_and_correlation/peass_v2.0.1```(from https://gitlab.inria.fr/bass-db/peass/-/tree/master/v2.0.1)
 - ```./00_training_and_inference/bigvgan_utils``` (from [4] https://github.com/NVIDIA/BigVGAN)
 - ```./00_training_and_inference/baseline_models/backbones``` (from [2] https://github.com/ZFTurbo/Music-Source-Separation-Training and [3] https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model)
 ## References:
