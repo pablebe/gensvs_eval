@@ -134,7 +134,7 @@ for csv_df_row in metrics_and_ratings_df.iterrows():
     csv_out =  csv_out._append(row_df_append.to_dict(),ignore_index=True)
     
 #save csv_out to folder_path
-csv_out.to_csv(os.path.join(OUT_PATH,'./04_dmos_metric_correlation/gensvs_eval_data.csv'), index=False)
+csv_out.to_csv(os.path.join(OUT_PATH,'gensvs_eval_data.csv'), index=False)
 
 
 ## Shapiro-Wilk to check for normality in test groups for generative, discriminative and individual models

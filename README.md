@@ -1,16 +1,19 @@
 # Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation
-This repository accompanies the submission titled "Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation".
-For audio examples and further information please visit our companion page (see link below)!
+This repository contains the code accompanying the WASPAA 2025 paper "Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation" by Paul A. Bereuter, Benjamin Stahl, Mark D. Plumbley and Alois Sontacchi.
 
-Paper: <URL>
+## ℹ️ Further information
+- Paper: [Preprint](https://arxiv.org/pdf/2507.11427)
+- Website: [Companion Page](https://pablebe.github.io/gensvs_eval_companion_page/) 
+- Data: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723)
 
-Companion Page: https://pablebe.github.io/gensvs_eval_companion_page/ 
 
-DMOS Data, Audio File & Metrics: <URL>
+## 📈 Benchmark you own metrics
+A simple Python script to benchmark objective metrics on our DMOS data is included in the zenodo dataset available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723).<br>
+Within the Readme.md of the dataset you'll find instructions on how to benchmark you own audio quality metrics on our DMOS data.
 
 ## 🚀 Getting Started: Conda Environment Setup
 To run all of the code in this repository we recommend setting up the following 5 conda environments.  
-Environments I-III are necessary to infer and train all models mentioned in the paper and environments IV-V are necessary to reproduce the evaluation and correlation analysis outlined in the paper. 
+Environments I-III are necessary to reproduce the evaluation and correlation analysis outlined in the paper and environments IV-V are necessary to infer and train all models.
 
 ### I. ```gensvs_eval_env```: Conda environment for evaluation of other metrics and correlation analysis
 For evaluating the model's performance using the objective evaluation metrics and reproduce the correlation analysis of the paper we recommend setting up an additional conda environment with:
@@ -57,11 +60,14 @@ For evaluating the model's performance using the proposed FAD and MSE evaluation
 
 Within the folder ```01_evaluation_and_correlation``` all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
 
-### Evaluation Data
+
+
+### Reproduce the evaluation carried out in the paper 
 All objective metrics are collected in a single file in ```./04_evaluation_data/all_metrics_df.csv``` and can be found individually in the folder ```./01_evaluation_and_correlation/evaluation_metrics```.   
 The DMOS data can be found in ```./04_evaluation_data/dmos_ratings.csv```  
 The raw listening test data including all the individual ratings can be found in ```./04_evaluation_data/dcr_test_ratings.csv```  
->Note: To evaluate all models and reproduce the results from the paper, the whole MUSDB18-HQ test-set needs to be processed with each model using the inference scripts. Or the processed audio files can be downloaded from: https://drive.google.com/drive/folders/16Yaz2Anws8G530M_4V0h12AcpRY3zMMJ?usp=sharing.
+>Note: To evaluate all models and reproduce the results from the paper, the whole MUSDB18-HQ test-set needs to be processed with each model using the inference scripts. Or the processed audio files can be downloaded from: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723)
+
 
 ### Compute Objective Evaluation Metrics
 To calculate all objective metrics mentioned in the paper three python scripts are necessary. The evaluation of PAM as well as the FAD & MSE metrics are carried out in separate scripts. For the computation of the FAD & MSE metrics the conda environment ```gensvs_fad_mse_eval_env``` is necessary. All other metrics can be computed with the ```gensvs_eval_env```.
@@ -86,8 +92,8 @@ To compute all other metrics mentioned in the paper please use
 - Required Conda environments:
    - I. ```gensvs_eval_env```
 ### Subjective Evaluation and correlation analysis
-In order to evaluate the DMOS data and reproduce the correlation analysis results, the python script can be executed under:
-- Python: ```./01_evaluation_and_correlation/gensvs_eval_dmos_corr.py```
+In order to evaluate the DMOS data, reproduce the correlation analysis results and export all the plots and *.csv files, the Python script can be executed under:
+- Python: ```./01_evaluation_and_correlation/gensvs_eval_plots_and_csv_export.py```
 - Required Conda environments:
    - I. ```gensvs_eval_env```
 
@@ -222,3 +228,14 @@ These references pertain only to the code reused to set up this codebase. For mo
 ```
 ## Cite This Work:
 Citation will be added here!
+```bib
+@misc{bereuter2025,
+      title={Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation Models}, 
+      author={Paul A. Bereuter and Benjamin Stahl and Mark D. Plumbley and Alois Sontacchi},
+      year={2025},
+      eprint={2507.11427},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS},
+      url={https://arxiv.org/abs/2507.11427}, 
+}
+```
