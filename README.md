@@ -56,7 +56,7 @@ For evaluating the model's performance using the proposed FAD and MSE evaluation
 ```$ pip install -r ./env_info/bigvgan_env_requirements.txt```
 
 ## 🧮 Evaluation and Correlation Analysis
-<img src="./04_evaluation_data/figures/gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="100%">  
+<img src="./03_evaluation_data/figures/gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="100%">  
 
 Within the folder ```01_evaluation_and_correlation``` all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
 
