@@ -97,7 +97,7 @@ In order to evaluate the DMOS data, reproduce the correlation analysis results a
 The folder ```00_training_and_inference``` contains all code required to carry out training and inference for all the models mentioned in the paper. 
 
 ### Trained models
- - HTDemucs, MelRoFo (S), SGMSVS and the finetuned BigVGAN checkpoints (generator and discriminator) can be downloaded here: https://drive.google.com/drive/folders/13D_0ciDODkNv9q5W9l2s2WsmpHlZJvnS?usp=sharing  
+ - HTDemucs, MelRoFo (S), SGMSVS and the finetuned BigVGAN checkpoints (generator and discriminator) can be downloaded from [Hugging Face](https://huggingface.co/collections/pablebe/gensvs-eval-model-checkpoints-687e1c967b43f867f34d6225)
  - The model checkpoint for MelRoFo (L) can be downloaded from [3].
 
 ### Inference
