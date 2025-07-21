@@ -98,7 +98,7 @@ The folder ```00_training_and_inference``` contains all code required to carry o
 
 ### Trained models
  - HTDemucs, MelRoFo (S), SGMSVS and the finetuned BigVGAN checkpoints (generator and discriminator) can be downloaded from [Hugging Face](https://huggingface.co/collections/pablebe/gensvs-eval-model-checkpoints-687e1c967b43f867f34d6225)
- - The model checkpoint for MelRoFo (L) can be downloaded from [3].
+ - The model checkpoint for MelRoFo (L) can be downloaded from [[3]](https://huggingface.co/KimberleyJSN/melbandroformer/blob/main/MelBandRoformer.ckpt).
 
 ### Inference
 To run all models mentioned in the paper on a folder of musical mixtures you can either use the python inference scripts or use the provided bash scripts which show how to call the python scripts:
