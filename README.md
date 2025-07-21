@@ -224,7 +224,7 @@ These references pertain only to the code reused to set up this codebase. For mo
               }
 ```
 ## Cite This Work:
-Citation will be added here!
+If you use our data or parts of the code in this repository please cite us with:
 ```bib
 @misc{bereuter2025,
       title={Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation Models}, 
