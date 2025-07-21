@@ -207,7 +207,7 @@ These references pertain only to the code reused to set up this codebase. For mo
 ```
 ```bib
 @inproceedings{lee2023bigvgan,
-               title={Big{VGAN}: A Universal Neural Vocoder with Large-Scale Training},
+               title={BigVGAN: A Universal Neural Vocoder with Large-Scale Training},
                author={Sang-gil Lee and Wei Ping and Boris Ginsburg and Bryan Catanzaro and Sungroh Yoon},
                booktitle={in Proc. ICLR, 2023},
                year={2023},
