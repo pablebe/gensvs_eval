@@ -35,6 +35,8 @@ For evaluating the model's performance using the proposed FAD and MSE evaluation
 ```$ pip install -r ./env_info/svs_fad_mse_eval_env.txt```  
 3. Test fadtk installation with: ```$ python -m fadtk.test```
 
+### III. Coming soon: One package to infer them all incl. environment to train them all!
+<!-- 
 ### III. ```gensvs_eval_baseline_env```: Conda environment for training and inference of **HTDemucs** and **MelRoFo (S)** 
 1. Create the conda environment:  
 ```$ conda env create -f ./env_info/mss_baseline_env_conda.yml```  
@@ -53,7 +55,7 @@ For evaluating the model's performance using the proposed FAD and MSE evaluation
 2. Create the conda environment:  
 ```$ conda env create -f ./env_info/bigvgan_env.yml```
 3. Install additional python dependencies:  
-```$ pip install -r ./env_info/bigvgan_env_requirements.txt```
+```$ pip install -r ./env_info/bigvgan_env_requirements.txt``` -->
 
 ## 🧮 Evaluation and Correlation Analysis
 <img src="./03_evaluation_data/figures/gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="100%">  
@@ -113,10 +115,11 @@ To run the mask-based baseline models on a folder of musical mixtures the follow
   - MelRoFo (L): ```$ 00_training_and_inference/infer_melroformer_large.sh```
 
 - Required Conda environment:
-   - III. ```gensvs_eval_baseline_env```
+   - *coming soon!* <!-- - III. ```gensvs_eval_baseline_env``` -->
 
 #### Generative models: SGMSVS & MelRoFo (S) + BigVGAN
-
+*pip-package to infere generative models on new data coming soon*! 
+<!-- 
 To run the generative models on a folder of musical mixtures the following scripts can be used:  
 - Python: 
   - SGMSVS: ```00_training_and_inference/inference_sgmsvs.py```
@@ -126,7 +129,7 @@ To run the generative models on a folder of musical mixtures the following scrip
   - MelRoFo (S) + BigVGAN: ```00_training_and_inference/infer_melroformer_small_bigvgan.sh```
 - Required Conda environment:
    - SGMSVS: IV. ```gensvs_eval_sgmsvs_env```
-   - MelRoFo (S) + BigVGAN: V. ```gensvs_eval_bigvgan_env```
+   - MelRoFo (S) + BigVGAN: V. ```gensvs_eval_bigvgan_env``` -->
 ### Training
 Below the python training scripts and example bash scripts are listed for all models to reproduce all trainings and the set parameters mentioned in the paper:
 #### Discriminative Baselines: HTDemucs & MelRoFo (S)
@@ -137,7 +140,8 @@ To train the dicriminative mask-based baselines use:
     - HTDemucs: ```$ 00_training_and_inference/train_htdemucs.sh```
     - MelRoFo (S): ```$ 00_training_and_inference/train_melroformer.sh```
   - Required Conda environment:
-    - III. ```gensvs_eval_baseline_env```
+    <!-- - III. ```gensvs_eval_baseline_env``` -->
+    - *coming soon!*
 #### Generative models: SGMSVS & MelRoFo (S) + BigVGAN
 To train the SGMSVS model or task-specifically finetune BigVGAN for singing voice separation with MelRoFo (S) you can use:
 
@@ -149,8 +153,9 @@ To train the SGMSVS model or task-specifically finetune BigVGAN for singing voic
    - MelRoFo (S) + BigVGAN: ```$ 00_training_and_inference/train_bigvgan.sh```
 
 - Required Conda environments:
-   - SGMSVS: II. ```gensvs_eval_sgmsvs_env```
-   - MelRoFo (S) + BigVGAN: III. ```gensvs_eval_bigvgan_env```
+   - *coming soon!*
+   <!-- - SGMSVS: II. ```gensvs_eval_sgmsvs_env```
+   - MelRoFo (S) + BigVGAN: III. ```gensvs_eval_bigvgan_env``` -->
 
 ## Third-party code
 All third-party code is contained in separate folders, each of which is specifically listed in this README.md file, if there exist LICENSE files for these third party folders they are located within their respective directories. The third-party directories are:

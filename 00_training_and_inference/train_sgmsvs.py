@@ -163,9 +163,7 @@ if __name__ == '__main__':
 
      if args.start_with_validation:
           model.eval()
-          trainer.validate(model, ckpt_path=args.ckpt)#, ckpt_path=args.ckpt)
+          trainer.validate(model, ckpt_path=args.ckpt)
           model.valid_ct += 1
      # Train model
      trainer.fit(model, ckpt_path=args.ckpt)
-     trainer.fit_loop.epoch_progress.current.completed=trainer.current_epoch-1
-     trainer.save_checkpoint("trained_models/sgmsvs/epoch=510-sdr=7.22_new.ckpt")
