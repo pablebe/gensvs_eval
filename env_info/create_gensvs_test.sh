@@ -15,6 +15,7 @@ conda activate gensvs_test
 
 # Set CUDA_HOME environment variable
 export CUDA_HOME="${CONDA_PREFIX}"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib
 echo "CUDA_HOME set to: $CUDA_HOME"
 
 # install gensvs package
