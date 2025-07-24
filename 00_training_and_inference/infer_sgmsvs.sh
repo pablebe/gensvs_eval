@@ -2,8 +2,8 @@
 
 # Bash script to start infer musical mixtures with SGMSVS model.
 python ./00_training_and_inference/inference_sgmsvs.py \
-    --test_dir "./audio_examples/Mixture" \
-    --enhanced_dir "./audio_examples/SGMSVS_inf_code" \
+    --test_dir "./03_audio_examples/Mixture" \
+    --enhanced_dir "./03_audio_examples/SGMSVS" \
     --ckpt "./trained_models/sgmsvs/sgmsvs_epoch=510-sdr=7.22.ckpt" \
     --sampler_type "pc" \
     --corrector "ald" \
