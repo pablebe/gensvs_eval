@@ -11,7 +11,6 @@ from sgmsvs.sgmse.util.other import pad_spec
 import numpy as np
 import torch.nn.functional as F
 
-#TODO: add support for validation with musmoisdb-dataset => does not work for some reason! without flag use_musdb_test_as_valid 
 
 def get_window(window_type, window_length):
     if window_type == 'sqrthann':
@@ -132,12 +131,12 @@ class MSSSpecs(Dataset):
         if dataset_str == "musdb":
             train_name_list = []
             test_name_list = []
-            train_name_list += sorted(glob(join(data_dir, "musdb18hq", "train", "**")))#sorted(glob(join(data_dir, "musdb18hq", "train", "**", "*.wav")))
+            train_name_list += sorted(glob(join(data_dir, "musdb18hq", "train", "**")))
             n_valid_files = int(valid_split * len(train_name_list))
             np.random.seed(rand_seed)
             idx_array = np.arange(len(train_name_list))
             valid_idx = np.random.choice(idx_array, n_valid_files, replace=False)
-            valid_name_list = np.array(train_name_list)[valid_idx].tolist()#[train_name_list.pop(i) for i in valid_idx]
+            valid_name_list = np.array(train_name_list)[valid_idx].tolist()
             train_name_list = np.array(train_name_list)
             train_name_list = np.delete(train_name_list, valid_idx).tolist()
             np.random.seed()
@@ -159,17 +158,15 @@ class MSSSpecs(Dataset):
                                            duration, samples_per_track, 
                                            valid_flag, rand_seed)
 
-#            print("xop")
-
         elif dataset_str == "moisesdb":
             train_name_list = []
             test_name_list = []
-            train_name_list += sorted(glob(join(data_dir, "moisesdb", "**")))#sorted(glob(join(data_dir, "musdb18hq", "train", "**", "*.wav")))
+            train_name_list += sorted(glob(join(data_dir, "moisesdb", "**")))
             n_valid_files = int(valid_split * len(train_name_list))
             np.random.seed(rand_seed)
             idx_array = np.arange(len(train_name_list))
             valid_idx = np.random.choice(idx_array, n_valid_files, replace=False)
-            valid_name_list = np.array(train_name_list)[valid_idx].tolist()#[train_name_list.pop(i) for i in valid_idx]
+            valid_name_list = np.array(train_name_list)[valid_idx].tolist()
             train_name_list = np.array(train_name_list)
             train_name_list = np.delete(train_name_list, valid_idx).tolist()
             np.random.seed()
@@ -191,13 +188,11 @@ class MSSSpecs(Dataset):
                                               valid_flag, enforce_full_mix_percentage,
                                               rand_seed)
 
-#            print("stop")
-
         elif dataset_str == "musmoisdb":
             moises_train_name_list = []
-            moises_train_name_list += sorted(glob(join(data_dir, "moisesdb", "**")))#sorted(glob(join(data_dir, "musdb18hq", "train", "**", "*.wav")))
+            moises_train_name_list += sorted(glob(join(data_dir, "moisesdb", "**")))
             musdb_train_name_list = []
-            musdb_train_name_list += sorted(glob(join(data_dir, "musdb18hq", "train", "**")))#sorted(glob(join(data_dir, "musdb18hq", "train", "**", "*.wav")))
+            musdb_train_name_list += sorted(glob(join(data_dir, "musdb18hq", "train", "**")))
             n_valid_files = int(valid_split * (len(musdb_train_name_list)+len(moises_train_name_list)))
             mus_mois_ratio = len(musdb_train_name_list)/len(moises_train_name_list)
             n_mus_valid_files = int(n_valid_files*mus_mois_ratio)
@@ -205,13 +200,13 @@ class MSSSpecs(Dataset):
             np.random.seed(rand_seed)
             mois_idx_array = np.arange(len(moises_train_name_list))
             mois_valid_idx = np.random.choice(mois_idx_array, n_mois_valid_files, replace=False)
-            mois_valid_name_list = np.array(moises_train_name_list)[mois_valid_idx].tolist()#[train_name_list.pop(i) for i in valid_idx]
+            mois_valid_name_list = np.array(moises_train_name_list)[mois_valid_idx].tolist()
             moises_train_name_list = np.array(moises_train_name_list)
             moises_train_name_list = np.delete(moises_train_name_list, mois_valid_idx).tolist()
 
             musdb_idx_array = np.arange(len(musdb_train_name_list))
             musdb_valid_idx = np.random.choice(musdb_idx_array, n_mus_valid_files, replace=False)
-            musdb_valid_name_list = np.array(musdb_train_name_list)[musdb_valid_idx].tolist()#[train_name_list.pop(i) for i in valid_idx]
+            musdb_valid_name_list = np.array(musdb_train_name_list)[musdb_valid_idx].tolist()
             musdb_train_name_list = np.array(musdb_train_name_list)
             musdb_train_name_list = np.delete(musdb_train_name_list, musdb_valid_idx).tolist()
             np.random.seed()
@@ -257,7 +252,6 @@ class MSSSpecs(Dataset):
         self.subset = subset
         self.dummy = dummy
         self.num_frames = num_frames
-#        self.shuffle_spec = shuffle_spec
         self.normalize = normalize
         self.spec_transform = spec_transform
         self.train_mono = train_mono
@@ -272,7 +266,6 @@ class MSSSpecs(Dataset):
 
         y, x, target_rms = self.dataset[i]
 
-
         # formula applies for center=True
         target_len = (self.num_frames ) * self.hop_length
         current_len = x.size(-1)
@@ -283,7 +276,6 @@ class MSSSpecs(Dataset):
             x = F.pad(x, (pad//2, pad//2+(pad%2)), mode='constant')
             if self.pad_mix:
                 y = F.pad(y, (pad//2, pad//2+(pad%2)), mode='constant')
-
 
         # normalize w.r.t to the noisy or the clean signal or not at all
         # to ensure same clean signal power in x and y.
@@ -309,10 +301,6 @@ class MSSSpecs(Dataset):
         
         if self.spec_transform is not None:
             X, Y = self.spec_transform(X), self.spec_transform(Y)
-#        else:
-            # just return audio for validation and test set
-#            X = x
-#            Y = y
         
         if X.isnan().any():
             print("X contain NaNs")
@@ -354,7 +342,6 @@ class SpecsDataModule(pl.LightningDataModule):
         parser.add_argument("--train_mono", action="store_true", help="Use only the first channel of the audio files.")
         parser.add_argument("--n_fft", type=int, default=1534, help="Number of FFT bins. 1534 by default.")   # to assure 256 freq bins
         parser.add_argument("--hop_length", type=int, default=384, help="Window hop length. 384 by default.")
-#        parser.add_argument("--num_frames", type=int, default=626, help="Number of frames for the dataset. 626 by default.")
         parser.add_argument("--window", type=str, choices=("sqrthann", "hann"), default="hann", help="The window function to use for the STFT. 'hann' by default.")
         parser.add_argument("--num_workers", type=int, default=8, help="Number of workers to use for DataLoaders. 8 by default.")
         parser.add_argument("--dummy", action="store_true", help="Use reduced dummy dataset for prototyping.")
@@ -367,7 +354,7 @@ class SpecsDataModule(pl.LightningDataModule):
     def __init__(
         self, base_dir, samples_per_track=1, valid_split=0.1, format='MSS', dataset_str='musdb', target_str='vocals', random_mix=False, 
         add_augmentation=False, full_mix_percentage=0.7, use_musdb_test_as_valid=False, duration=5.0, rand_seed=13, batch_size=8, train_mono=False,
-        n_fft=1534, hop_length=384, sr=48000, window='hann',#, num_frames=626
+        n_fft=1534, hop_length=384, sr=48000, window='hann',
         num_workers=8, dummy=False, spec_factor=0.065, spec_abs_exponent=0.667,
         gpu=True, normalize='noisy', transform_type="exponent", **kwargs
     ):

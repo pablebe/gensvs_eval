@@ -5,7 +5,7 @@ This repository contains the code accompanying the WASPAA 2025 paper "Towards Re
 - Paper: [Preprint](https://arxiv.org/pdf/2507.11427)
 - Website: [Companion Page](https://pablebe.github.io/gensvs_eval_companion_page/) 
 - Data: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723)
-
+- PyPi Package
 
 ## 📈 Benchmark you own metrics
 A simple Python script to benchmark objective metrics on our DMOS data using the paper's correlation analysis is included in the Zenodo dataset available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723).<br>
@@ -18,9 +18,8 @@ To run all of the code in this repository we recommend setting up the following 
 Environments I-III are necessary to reproduce the evaluation and correlation analysis outlined in the paper and environments IV-V are necessary to infer and train all models.
 ### I. ```gensvs_eval_env```: Conda environment for computation intrusive and non-intrusive metrics and correlation analysis
 For evaluating the model's performance using the intrusive and non-intrusive metrics of the paper, as well as exporting all plots and the *.csv-files of the paper. We recommend setting up an additional conda environment with:
-1. Create the conda environment:  
+1. Create the conda environment:
 ```$ ./env_info/svs_eval_env.yml``` 
-
 2. Install additional python dependencies:  
 ```$ ./env_info/svs_eval_env.txt```
 3. Build the ViSQOL API according to instructions of https://github.com/google/visqol and place in folder within the root directory

@@ -31,7 +31,7 @@ from bigvgan_utils.utils import load_checkpoint
 from bigvgan_utils.meldataset import mel_spectrogram
 from sgmsvs.loudness import calculate_loudness
 
-SAVE_MELROFORM_AUDIO = False
+SAVE_MELROFORM_AUDIO = True
 FADE_LEN = 0.1 # seconds
 LOUDNESS_LEVEL = -18 # dBFS
 
@@ -99,6 +99,11 @@ if __name__ == '__main__':
         if sr != target_sr:
             y = torch.tensor(resample(y.numpy(), orig_sr=sr, target_sr=target_sr))
         # Backward transform in time domain
+
+        if y.shape[0]<2:
+            # if audio has only one channel copy and stack channel to get stereo input for model 
+            y = torch.stack((y, y), dim=0).squeeze()
+            
         with torch.no_grad():
             norm_fac = y.abs().max()
             y = y / norm_fac

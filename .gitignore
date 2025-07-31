@@ -12,3 +12,4 @@ checkpoints/
 03_evaluation_data/export_data_csv.py
 *.numbers
 04_zenodo_upload
+audio_examples/

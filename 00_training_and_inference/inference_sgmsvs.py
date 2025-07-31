@@ -91,7 +91,6 @@ if __name__ == '__main__':
         # Normalize
         norm_factor = y.abs().max()
         y = y / norm_factor
-        
         with torch.no_grad():
             # Prepare DNN input
             if y.shape[0]>1:
@@ -118,13 +117,10 @@ if __name__ == '__main__':
                     else:
                         raise ValueError(f"SDE {model.sde.__class__.__name__} not supported")
                     sample, _ = sampler()
-                    
                     # Backward transform in time domain
                     temp = model.to_audio(sample.squeeze(), T_orig)
                     x_hat_ch.append(temp)
                 x_hat = torch.stack(x_hat_ch, dim=0)
-                
-#                print("stop")
         
             else:            
                 if model.sde.__class__.__name__ == 'OUVESDE':

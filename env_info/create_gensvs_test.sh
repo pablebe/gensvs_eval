@@ -20,4 +20,4 @@ echo "CUDA_HOME set to: $CUDA_HOME"
 
 # install gensvs package
 echo "Installing gensvs package..."
-pip install -e "/home/bereuter/experiments/gensvs"
+pip install gensvs

@@ -1,9 +1,9 @@
-name: gensvs_test
+name: gensvs_env
 channels:
   - conda-forge
   - nvidia
   - defaults
 dependencies:
   - python>=3.11
-  - cuda=12.6.2=0
+  - cuda>=12.6.2
 
