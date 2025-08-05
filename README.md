@@ -11,8 +11,10 @@ This repository contains the code accompanying the WASPAA 2025 paper "Towards Re
 A simple Python script to benchmark objective metrics on our DMOS data using the paper's correlation analysis is included in the Zenodo dataset available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723).<br>
 Instructions for benchmarking your own audio quality metrics are provided in the dataset’s Readme.md file.
 
-## 🚀 Getting Started: Conda Environment Setup
->**Note**: If you are only interested in using our DMOS data, or if you want to benchmark your metric against it, you don't need to install any environments, just follow the instructions included in the Zenodo dataset linked above.<br>
+## 🚀 Getting Started:
+>**Note**: If you are only interested in using our DMOS data, or if you want to benchmark your metric against it, you don't need to install any environments, just follow the instructions included in the [Zenodo dataset](https://doi.org/10.5281/zenodo.15911723).<br>
+
+We have released a [PyPi package](https://pypi.org/project/gensvs/) which enables straight forward inference of the generative models included in the paper (SGMSVS & MelRoFo (S)+BigVGAN) and computation of the embedding-based MSE for MERT and Music2Latlent embeddings that exhibited the highest correlation with the DMOS data.  
 
 To run all of the code in this repository we recommend setting up the following 5 conda environments.  
 Environments I-III are necessary to reproduce the evaluation and correlation analysis outlined in the paper and environments IV-V are necessary to infer and train all models.
@@ -159,23 +161,27 @@ To train the SGMSVS model or task-specifically finetune BigVGAN for singing voic
 ## Third-party code
 All third-party code is contained in separate folders, each of which is specifically listed in this README.md file, if there exist LICENSE files for these third party folders they are located within their respective directories. The third-party directories are:
 
-- ```./00_training_and_inference/sgmsvs/sgmse``` (from [1] https://github.com/sp-uhh/sgmse)
+- ```./00_training_and_inference/sgmsvs/sgmse``` (from https://github.com/sp-uhh/sgmse)
 - ```./01_evaluation_and_correlation/pam_eval``` (from https://github.com/soham97/PAM)
 - ```./01_evaluation_and_correlation/peass_v2.0.1```(from https://gitlab.inria.fr/bass-db/peass/-/tree/master/v2.0.1)
-- ```./00_training_and_inference/bigvgan_utils``` (from [4] https://github.com/NVIDIA/BigVGAN)
-- ```./00_training_and_inference/baseline_models/backbones``` (from [2] https://github.com/ZFTurbo/Music-Source-Separation-Training and [3] https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model)
-## References:
-These references pertain only to the code reused to set up this codebase. For more information on the origins of the models, please refer to the references within the paper.
+- ```./00_training_and_inference/bigvgan_utils``` (from https://github.com/NVIDIA/BigVGAN)
+- ```./00_training_and_inference/baseline_models/backbones``` (from https://github.com/ZFTurbo/Music-Source-Separation-Training and https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model)
 
->[1] Julius Richter, Simon Welker, Jean-Marie Lemercier, Bunlong Lay, Timo Gerkmann. "Speech Enhancement and Dereverberation with Diffusion-Based Generative Models", IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 31, pp. 2351-2364, 2023, Git Repository: <url>https://github.com/sp-uhh/sgmse</url>
->  
->[2] Roman Solovyev, Alexander Stempkovskiy, Tatiana Habruseva. "Benchmarks and leaderboards for sound demixing tasks", 2023, Git Repository: <url>https://github.com/ZFTurbo/Music-Source-Separation-Training</url>
->
->[3] Kimberley Jensen, "Mel-Band-Roformer-Vocal-Model", 2024, Git Repository:<url>https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model</url>
->
->[4] Sang-gil Lee, Wei Ping, Boris Ginsburg, Bryan Catanzaro, Sungroh Yoon, "Big{VGAN}: A Universal Neural Vocoder with Large-Scale Training", in Proc. ICLR, 2023, Git Repository: <url>https://github.com/NVIDIA/BigVGAN</url>
->
->[5] Azalea Gui, Hannes Gamper, Sebastian Braun, Dimitra Emmanouilidou, "Adapting Frechet Audio Distance for Generative Music Evaluation", in Proc. ICASSP, 2024, Git Repository: <url>https://github.com/microsoft/fadtk</url>
+## Citations, References and Acknowledgements
+If you use this package in your work please do not forget to cite our paper and the work which built the foundation for this package.
+Our paper can be cited with:
+```bib
+@misc{bereuter2025,
+      title={Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation Models}, 
+      author={Paul A. Bereuter and Benjamin Stahl and Mark D. Plumbley and Alois Sontacchi},
+      year={2025},
+      eprint={2507.11427},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS},
+      url={https://arxiv.org/abs/2507.11427}, 
+}
+```
+The inference code for the SGMSVS model was built upon the code made available in:
 ```bib
 @article{richter2023speech,
          title={Speech Enhancement and Dereverberation with Diffusion-based Generative Models},
@@ -187,6 +193,7 @@ These references pertain only to the code reused to set up this codebase. For mo
          doi={10.1109/TASLP.2023.3285241}
         }
 ```
+The inference code for MelRoFo (S) + BigVGAN was put together from the code available at:
 ```bib
 @misc{solovyev2023benchmarks,
       title={Benchmarks and leaderboards for sound demixing tasks}, 
@@ -218,6 +225,7 @@ These references pertain only to the code reused to set up this codebase. For mo
                url={https://openreview.net/forum?id=iTtGCMDEzS_}
               }
 ```
+The whole evaluation code was created using Microsoft's [Frechet Audio Distance Tookit](https://github.com/microsoft/fadtk/tree/main) as a template
 ```bib
 @inproceedings{fadtk,
                title = {Adapting Frechet Audio Distance for Generative Music Evaluation},
@@ -227,16 +235,28 @@ These references pertain only to the code reused to set up this codebase. For mo
                url = {https://arxiv.org/abs/2311.01616},
               }
 ```
-## Cite This Work:
-If you use our data or parts of the code in this repository please cite us with:
+If you use the [MERT](https://huggingface.co/m-a-p/MERT-v1-95M) or [Music2Latent](https://github.com/SonyCSLParis/music2latent) MSE please also cite the initial work in which the embeddings were proposed. 
+
+For [MERT](https://huggingface.co/m-a-p/MERT-v1-95M):
 ```bib
-@misc{bereuter2025,
-      title={Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation Models}, 
-      author={Paul A. Bereuter and Benjamin Stahl and Mark D. Plumbley and Alois Sontacchi},
-      year={2025},
-      eprint={2507.11427},
+@misc{li2023mert,
+      title={MERT: Acoustic Music Understanding Model with Large-Scale Self-supervised Training}, 
+      author={Yizhi Li and Ruibin Yuan and Ge Zhang and Yinghao Ma and Xingran Chen and Hanzhi Yin and Chenghua Lin and Anton Ragni and Emmanouil Benetos and Norbert Gyenge and Roger Dannenberg and Ruibo Liu and Wenhu Chen and Gus Xia and Yemin Shi and Wenhao Huang and Yike Guo and Jie Fu},
+      year={2023},
+      eprint={2306.00107},
       archivePrefix={arXiv},
-      primaryClass={eess.AS},
-      url={https://arxiv.org/abs/2507.11427}, 
+      primaryClass={cs.SD}
+}
+```
+For [Music2Latent](https://github.com/SonyCSLParis/music2latent):
+```bib
+@inproceedings{pasini2024music2latent,
+  author       = {Marco Pasini and Stefan Lattner and George Fazekas},
+  title        = {{Music2Latent}: Consistency Autoencoders for Latent Audio Compression},
+  booktitle    = ismir,
+  year         = 2024,
+  pages        = {111-119},
+  venue        = {San Francisco, California, USA and Online},
+  doi          = {10.5281/zenodo.14877289},
 }
 ```

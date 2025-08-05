@@ -47,9 +47,7 @@ def augment_force_stereo(audio: torch.Tensor) -> torch.Tensor:
     return audio
 
 def get_subfoldernames_in_folder(folderPath: string):
-
-    subfolder_list = [f.path.decode("utf-8") for f in os.scandir(folderPath) if f.is_dir()]
-
+    subfolder_list = [f.path for f in os.scandir(folderPath) if f.is_dir()]
     return subfolder_list
 class MSSMUSDBDataset(data.Dataset):
     def __init__(self, 
@@ -536,7 +534,8 @@ class MSSMoisesDBDataset(data.Dataset):
         target_bass_filepath = [os.path.join(target_bass_folder,'bass',f) if f.endswith('.wav') else None for f in os.listdir(os.path.join(target_bass_folder,'bass'))][0]
         target_vocals_filepath = [os.path.join(target_vocals_folder,'vocals',f) if f.endswith('.wav') else None for f in os.listdir(os.path.join(target_vocals_folder,'vocals'))][0]
         target_drums_filepath = [os.path.join(target_drums_folder,'drums',f) if f.endswith('.wav') else None for f in os.listdir(os.path.join(target_drums_folder,'drums'))][0]
-        target_other_filepaths = [os.path.join(f, os.listdir(f)[0].decode('utf-8')) for f in target_other_folders if os.listdir(f)[0].decode('utf-8').endswith('.wav')]
+        target_other_filepaths = [os.path.join(f, os.listdir(f)[0]) for f in target_other_folders if os.listdir(f)[0].endswith('.wav')]
+
         if random_mixing_flag:
             bass_info = soundfile.info(target_bass_filepath)
             bass_len = bass_info.frames
