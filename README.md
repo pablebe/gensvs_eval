@@ -1,72 +1,53 @@
 # Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation
-This repository contains the code accompanying the WASPAA 2025 paper "Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation" by Paul A. Bereuter, Benjamin Stahl, Mark D. Plumbley and Alois Sontacchi.
+<img src="./03_evaluation_data/figures/gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="100%">  
 
+This repository contains the code accompanying the WASPAA 2025 paper "Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation" by Paul A. Bereuter, Benjamin Stahl, Mark D. Plumbley and Alois Sontacchi.
 ## ℹ️ Further information
 - Paper: [Preprint](https://arxiv.org/pdf/2507.11427)
 - Website: [Companion Page](https://pablebe.github.io/gensvs_eval_companion_page/) 
 - Data: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723)
-- PyPi Package
+- More Code: [PyPi Package](https://pypi.org/project/gensvs/)
+- Model Checkpoints: [Hugging Face](https://huggingface.co/collections/pablebe/gensvs-eval-model-checkpoints-687e1c967b43f867f34d6225)
 
 ## 📈 Benchmark you own metrics
 A simple Python script to benchmark objective metrics on our DMOS data using the paper's correlation analysis is included in the Zenodo dataset available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723).<br>
 Instructions for benchmarking your own audio quality metrics are provided in the dataset’s Readme.md file.
 
+## 🏃🏽‍♀️‍➡️ Model Inference and Embedding-based MSE Evaluation
+
+If you want to use the proposed generative models (SGMSVS, MelRoFo (S) + BigVGAN) to separate singing voice from musical mixtures, or if you want to compute the embedding-based MSE of MERT or Music2Latent embeddings take a look at our [PyPi package](https://pypi.org/project/gensvs/).
+
 ## 🚀 Getting Started:
->**Note**: If you are only interested in using our DMOS data, or if you want to benchmark your metric against it, you don't need to install any environments, just follow the instructions included in the [Zenodo dataset](https://doi.org/10.5281/zenodo.15911723).<br>
+We have released a [PyPi package](https://pypi.org/project/gensvs/) that enables straightforward inference of the generative models (SGMSVS & MelRoFo (S)+BigVGAN) presented in the paper. It also facilitates the computation of the embedding-based mean squared error (MSE) for the MERT and Music2Latent embeddings, which exhibited the highest correlation with DMOS data in our study. Besides enabling easy model inference and embedding-based MSE computation (currently only for MERT and Music2Latent), this package can be used to run all the training code provided in this GitHub repository. Information on how to set up an environment to run the inference and training code can be found below (see I.). You will also find instructions on setting up conda environments to reproduce the computation of all the metrics included in our study and to carry out the correlation analysis outlined in the paper (see II., III.).
+### I. ```gensvs_env```: Conda environment for easy model inference, computation of MSE on MERT/Music2Latent embeddings and model training 
+1. Create conda environment: ```$ ./env_info/gensvs_env.yml```
+2. Activate conda environment ```$ conda activate gensvs_env```
+2. Install [gensvs](https://pypi.org/project/gensvs/) package: ```$ pip install gensvs```
+3. [Alternative] Run Bash script that sets up conda environment and installs [gensvs](https://pypi.org/project/gensvs/) from root directory: ```$ ./env_info/setup_gensvs_env.sh```
 
-We have released a [PyPi package](https://pypi.org/project/gensvs/) which enables straight forward inference of the generative models included in the paper (SGMSVS & MelRoFo (S)+BigVGAN) and computation of the embedding-based MSE for MERT and Music2Latlent embeddings that exhibited the highest correlation with the DMOS data.  
-
-To run all of the code in this repository we recommend setting up the following 5 conda environments.  
-Environments I-III are necessary to reproduce the evaluation and correlation analysis outlined in the paper and environments IV-V are necessary to infer and train all models.
-### I. ```gensvs_eval_env```: Conda environment for computation intrusive and non-intrusive metrics and correlation analysis
-For evaluating the model's performance using the intrusive and non-intrusive metrics of the paper, as well as exporting all plots and the *.csv-files of the paper. We recommend setting up an additional conda environment with:
-1. Create the conda environment:
-```$ ./env_info/svs_eval_env.yml``` 
-2. Install additional python dependencies:  
-```$ ./env_info/svs_eval_env.txt```
+### II. ```gensvs_eval_env```: Conda environment for computation of all non-embedding-based intrusive and non-intrusive metrics and for the correlation analysis
+Set up the following environment for evaluating all non-intrusive metrics of the paper, as well as for plot and *.csv export.
+1. Create conda environment: ```$ ./env_info/svs_eval_env.yml```
+2. Activate conda environment: ```$ conda activate gensvs_eval_env```
+2. Install additional python dependencies: ```$ pip install -r ./env_info/svs_eval_env.txt```
 3. Build the ViSQOL API according to instructions of https://github.com/google/visqol and place in folder within the root directory
    - >**Note:** URL and SHA256 of Armadillo headers in the file "WORKSPACE" need to be changed to a recent version (https://sourceforge.net/projects/arma/files/)
 4. To compute metrics with the PEASS-toolkit in the folder ```./01_evaluation_and_correlation/peass_v2.0.1``` Matlab (version<2025a) is required to execute Python's Matlab engine   
 
-### II. ```gensvs_fad_mse_eval_env```: Conda environment for evaluation intrusive embedding-based metrics
-For evaluating the model's performance using the proposed FAD and MSE evaluation metrics an additional conda environment has to be set up. This conda envirnonment builds on Microsoft's Frechet Audio Distance Toolkit [5].
-1. Create the conda environment:
-```$ conda env create -f ./env_info/svs_fad_mse_eval_env.yml``` 
-2. Install additional python dependencies:
-```$ pip install -r ./env_info/svs_fad_mse_eval_env.txt```  
+### III. ```gensvs_fad_mse_eval_env```: Conda environment for evaluation intrusive embedding-based metrics
+For computation of FAD and MSE evaluation metrics in addition to MERT/Music2Latent MSEs you'll need an additional conda environment. Please follow the steps below to set the environment up:
+1. Create the conda environment: ```$ conda env create -f ./env_info/svs_fad_mse_eval_env.yml``` 
+2. Install additional python dependencies: ```$ pip install -r ./env_info/svs_fad_mse_eval_env.txt```  
 3. Test fadtk installation with: ```$ python -m fadtk.test```
 
-### III. Coming soon: One package to infer them all incl. environment to train them all!
-<!-- 
-### III. ```gensvs_eval_baseline_env```: Conda environment for training and inference of **HTDemucs** and **MelRoFo (S)** 
-1. Create the conda environment:  
-```$ conda env create -f ./env_info/mss_baseline_env_conda.yml```  
-2. Install additional python dependencies:  
-```$ pip install -r ./env_info/mss_baseline_env_requirements.txt```
-
-### IV. ```gensvs_eval_sgmsvs_env```: Conda environment for training and inference of **SGMSVS** model
-1. Set the ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where the CUDA toolkit is installed. This can be the path where conda environment will be located
-2. Create the conda environment:   
-```$ conda env create -f ./env_info/sgmsvs_env_conda.yml```
-3. Install additional python dependencies:  
-```$ pip install -r ./env_info/sgmsvs_env.txt```
-
-### V. ```gensvs_eval_bigvgan_env```: Conda environment for training/finetuning and inference of **MelRoFo (S)+BigVGAN**
-1. Set ```CUDA_HOME```environment variable in ```env_info/sgmsvs_env_conda.yml``` to path where conda environment will be located
-2. Create the conda environment:  
-```$ conda env create -f ./env_info/bigvgan_env.yml```
-3. Install additional python dependencies:  
-```$ pip install -r ./env_info/bigvgan_env_requirements.txt``` -->
-
 ## 🧮 Evaluation and Correlation Analysis
-<img src="./03_evaluation_data/figures/gen_disc_srcc_tradeoff.png" alt="Correlation Results" width="100%">  
 
-Within the folder ```01_evaluation_and_correlation``` all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
+Within the folder [```01_evaluation_and_correlation```](https://github.com/pablebe/gensvs_eval/tree/main/01_evaluation_and_correlation) all code to compute all objective evaluation metrics, the evaluation of the DCR test results and the correlation analysis of the paper are collected.
 
-All metrics, listening test results, DMOS ratings, and the audio used for both metric computation and loudness-normalized listening tests are available on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723), where a single CSV file combines all computed metrics, DMOS ratings, and individual ratings for each audio sample. The dataset also includes instructions and an example Python script to help you benchmark your own audio quality metric by calculating correlation coefficients on our dataset. If you are only interested in the final data, you can ignore the individual CSV files located in the ```./04_evaluation_data``` folder, as they reflect intermediate steps during the paper’s development.
+All metrics, listening test results, DMOS ratings, and the audio used for both metric computation and loudness-normalized listening tests are available on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723), where a single CSV file combines all computed metrics, DMOS ratings, and individual ratings for each audio sample. The dataset also includes instructions and an example Python script to help you benchmark your own audio quality metric by calculating correlation coefficients on our dataset. If you are only interested in the final data, you can ignore the individual CSV files located in the [```./04_evaluation_data```](https://github.com/pablebe/gensvs_eval/tree/main/03_evaluation_data) folder, as they reflect intermediate steps during the paper’s development.
 
 ### Reproduce the evaluation carried out in the paper 
-If you really want to look into how we calculated all metrics follow the steps below: 
+If you want to reproduce how we calculated all metrics, please download the data from [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15911723.svg)](https://doi.org/10.5281/zenodo.15911723) and copy the data into the root directory. Then follow the steps below: 
 
 ### Compute Objective Evaluation Metrics
 To calculate all objective metrics mentioned in the paper three python scripts are necessary. The evaluation of PAM as well as the FAD & MSE metrics are carried out in separate scripts. For the computation of the FAD & MSE metrics the conda environment ```gensvs_fad_mse_eval_env``` is necessary. All other metrics can be computed with the ```gensvs_eval_env```.
@@ -74,49 +55,50 @@ To calculate all objective metrics mentioned in the paper three python scripts a
 #### Compute FAD & MSE metrics 
 To compute the FAD and MSE metrics we modified the code of Microsoft's fadtk [5]. The modified code can be found in ```./01_evaluation_and_correlation/fadtk_mod```.
 The metrics can be computed with a python script. To show how the evaluation script is called we have added a examplary bash scripts.
-- Python: ```./01_evaluation_and_correlation/gensvs_eval_fad_mse.py```
-- Bash: ```$ ./01_evaluation_and_correlation/gensvs_eval_fad_mse.sh```
+- Python: [```./01_evaluation_and_correlation/gensvs_eval_fad_mse.py```](https://github.com/pablebe/gensvs_eval/blob/main/01_evaluation_and_correlation/gensvs_eval_fad_mse.py)
+- Bash: [```$ ./01_evaluation_and_correlation/gensvs_eval_fad_mse.sh```](https://github.com/pablebe/gensvs_eval/blob/main/01_evaluation_and_correlation/gensvs_eval_fad_mse.sh)
 - Required Conda environments:
    - II. ```gensvs_fad_mse_eval_env```
 #### Compute PAM scores
 To compute the PAM scores of https://github.com/soham97/PAM please use the following scripts:
-- Python: ```./01_evaluation_and_correlation/gensvs_eval_pam.py```
-- Bash: ```$ 01_evaluation_and_correlation/gensvs_eval_pam.sh```
+- Python: [```./01_evaluation_and_correlation/gensvs_eval_pam.py```](https://github.com/pablebe/gensvs_eval/blob/main/01_evaluation_and_correlation/gensvs_eval_pam.py)
+- Bash: [```$ 01_evaluation_and_correlation/gensvs_eval_pam.sh```](https://github.com/pablebe/gensvs_eval/blob/main/01_evaluation_and_correlation/gensvs_eval_pam.sh)
 - Required Conda environments:
    - I. ```gensvs_eval_env```
 #### Compute all other non-intrusive and intrusive metrics (BSS-Eval, PEASS, SINGMOS, XLS-R-SQA, Audiobox-AES)
 To compute all other metrics mentioned in the paper please use
-- Python: ```./01_evaluation_and_correlation/gensvs_eval_metrics.py```
-- Bash: ```$ ./01_evaluation_and_correlation/gensvs_eval_metrics.sh```
+- Python: [```./01_evaluation_and_correlation/gensvs_eval_metrics.py```](https://github.com/pablebe/gensvs_eval/blob/main/01_evaluation_and_correlation/gensvs_eval_metrics.py)
+- Bash: [```$ ./01_evaluation_and_correlation/gensvs_eval_metrics.sh```](https://github.com/pablebe/gensvs_eval/blob/main/01_evaluation_and_correlation/gensvs_eval_metrics.py)
 - Required Conda environments:
    - I. ```gensvs_eval_env```
 ### Subjective Evaluation and correlation analysis
 In order to evaluate the DMOS data, reproduce the correlation analysis results and export all the plots and *.csv files, the Python script can be executed under:
-- Python: ```./01_evaluation_and_correlation/gensvs_eval_plots_and_csv_export.py```
+- Python: [```./01_evaluation_and_correlation/gensvs_eval_plots_and_csv_export.py```](https://github.com/pablebe/gensvs_eval/blob/main/01_evaluation_and_correlation/gensvs_eval_plots_and_csv_export.py)
 - Required Conda environments:
    - I. ```gensvs_eval_env```
 
 ## 🏋🏽‍♀️🏃🏽‍♀️‍➡️ Training and Inference
-The folder ```00_training_and_inference``` contains all code required to carry out training and inference for all the models mentioned in the paper. 
+>**Note:** The inference of the generative models (SGMSVS and MelRoFo (S) + BigVGAN) are executable using [gensvs](https://pypi.org/project/gensvs/). The inference can be carried out using either the included command line tool or a Python script (see [gensvs](https://pypi.org/project/gensvs/)).
+
+The folder [```00_training_and_inference```](https://github.com/pablebe/gensvs_eval/tree/main/00_training_and_inference) contains all code required to carry out training and inference for all the models mentioned in the paper.
+To carry out this code please set up the conda environment ```gensvs_env``` with [gensvs](https://pypi.org/project/gensvs/) installed (see I. above)
 
 ### Trained models
  - HTDemucs, MelRoFo (S), SGMSVS and the finetuned BigVGAN checkpoints (generator and discriminator) can be downloaded from [Hugging Face](https://huggingface.co/collections/pablebe/gensvs-eval-model-checkpoints-687e1c967b43f867f34d6225)
- - The model checkpoint for MelRoFo (L) can be downloaded from [[3]](https://huggingface.co/KimberleyJSN/melbandroformer/blob/main/MelBandRoformer.ckpt).
+ - The model checkpoint for MelRoFo (L) can be downloaded [here](https://huggingface.co/KimberleyJSN/melbandroformer/blob/main/MelBandRoformer.ckpt).
 
 ### Inference
-To run all models mentioned in the paper on a folder of musical mixtures you can either use the python inference scripts or use the provided bash scripts which show how to call the python scripts:
+If you want to run the inference of all models using the Python code provided in this GitHub repository you can either use the python inference scripts directly or use the provided bash scripts which show how to call the python scripts:
 #### Discriminative baseline models: HTDemucs, MelRoFo (S) & MelRoFo (L)
 To run the mask-based baseline models on a folder of musical mixtures the following scripts can be used:  
 - Python:
-  - HTDemucs & MelRoFo (S): ```00_training_and_inference/inference_baseline.py```  
-  - MelRoFo (L): ```00_training_and_inference/inference_melroformer_large.py```  
+  - HTDemucs & MelRoFo (S): [```00_training_and_inference/inference_baseline.py```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/inference_baseline.py)
+  - MelRoFo (L): [```00_training_and_inference/inference_melroformer_large.py```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/infer_melroformer_large.sh)
 - Bash:
-  - HTDemucs: ```$ 00_training_and_inference/infer_htdemucs.sh```
-  - MelRoFo (S): ```$ 00_training_and_inference/infer_melroformer_small.sh``` 
-  - MelRoFo (L): ```$ 00_training_and_inference/infer_melroformer_large.sh```
-
-- Required Conda environment:
-   - *coming soon!* <!-- - III. ```gensvs_eval_baseline_env``` -->
+  - HTDemucs: [```$ 00_training_and_inference/infer_htdemucs.sh```](00_training_and_inference/infer_htdemucs.sh)
+  - MelRoFo (S): [```$ 00_training_and_inference/infer_melroformer_small.sh```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/infer_melroformer_small.sh)
+  - MelRoFo (L): [```$ 00_training_and_inference/infer_melroformer_large.sh```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/infer_melroformer_large.sh)
+ <!-- - III. ```gensvs_eval_baseline_env``` -->
 
 #### Generative models: SGMSVS & MelRoFo (S) + BigVGAN
 *pip-package to infere generative models on new data coming soon*! 
@@ -136,51 +118,34 @@ Below the python training scripts and example bash scripts are listed for all mo
 #### Discriminative Baselines: HTDemucs & MelRoFo (S)
 To train the dicriminative mask-based baselines use:
   - Python:
-    - HTDemucs & MelRoFo (S): ```00_training_and_inference/train_baseline.py```
+    - HTDemucs & MelRoFo (S): [```00_training_and_inference/train_baseline.py```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/train_baseline.py)
   - Bash: 
-    - HTDemucs: ```$ 00_training_and_inference/train_htdemucs.sh```
-    - MelRoFo (S): ```$ 00_training_and_inference/train_melroformer.sh```
-  - Required Conda environment:
-    <!-- - III. ```gensvs_eval_baseline_env``` -->
-    - *coming soon!*
+    - HTDemucs: [```$ 00_training_and_inference/train_htdemucs.sh```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/train_htdemucs.sh)
+    - MelRoFo (S): [```$ 00_training_and_inference/train_melroformer.sh```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/train_melroformer.sh)
 #### Generative models: SGMSVS & MelRoFo (S) + BigVGAN
 To train the SGMSVS model or task-specifically finetune BigVGAN for singing voice separation with MelRoFo (S) you can use:
 
 - Python: 
-   - SGMSVS: ```00_training_and_inference/train_sgmsvs.py```
-   - MelRoFo (S) + BigVGAN: ```00_training_and_inference/train_finetune_bigvgan.py```
+   - SGMSVS: [```00_training_and_inference/train_sgmsvs.py```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/train_sgmsvs.py)
+   - MelRoFo (S) + BigVGAN: [```00_training_and_inference/train_finetune_bigvgan.py```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/train_finetune_bigvgan.py)
 - Bash: 
-   - SGMSVS: ```$ 00_training_and_inference/train_sgmsvs.sh```
-   - MelRoFo (S) + BigVGAN: ```$ 00_training_and_inference/train_bigvgan.sh```
-
-- Required Conda environments:
-   - *coming soon!*
+   - SGMSVS: [```$ 00_training_and_inference/train_sgmsvs.sh```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/train_sgmsvs.sh)
+   - MelRoFo (S) + BigVGAN: [```$ 00_training_and_inference/train_bigvgan.sh```](https://github.com/pablebe/gensvs_eval/blob/main/00_training_and_inference/train_bigvgan.sh)
    <!-- - SGMSVS: II. ```gensvs_eval_sgmsvs_env```
    - MelRoFo (S) + BigVGAN: III. ```gensvs_eval_bigvgan_env``` -->
 
 ## Third-party code
-All third-party code is contained in separate folders, each of which is specifically listed in this README.md file, if there exist LICENSE files for these third party folders they are located within their respective directories. The third-party directories are:
+All third-party code is contained in separate folders, each of which is specifically listed in this README.md file, if there exist LICENSE files for these third party folders they are located within their respective directories.
 
-- ```./00_training_and_inference/sgmsvs/sgmse``` (from https://github.com/sp-uhh/sgmse)
-- ```./01_evaluation_and_correlation/pam_eval``` (from https://github.com/soham97/PAM)
-- ```./01_evaluation_and_correlation/peass_v2.0.1```(from https://gitlab.inria.fr/bass-db/peass/-/tree/master/v2.0.1)
-- ```./00_training_and_inference/bigvgan_utils``` (from https://github.com/NVIDIA/BigVGAN)
-- ```./00_training_and_inference/baseline_models/backbones``` (from https://github.com/ZFTurbo/Music-Source-Separation-Training and https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model)
+The third-party directories are:
 
-## Citations, References and Acknowledgements
-If you use this package in your work please do not forget to cite our paper and the work which built the foundation for this package.
-Our paper can be cited with:
-```bib
-@misc{bereuter2025,
-      title={Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation Models}, 
-      author={Paul A. Bereuter and Benjamin Stahl and Mark D. Plumbley and Alois Sontacchi},
-      year={2025},
-      eprint={2507.11427},
-      archivePrefix={arXiv},
-      primaryClass={eess.AS},
-      url={https://arxiv.org/abs/2507.11427}, 
-}
-```
+- [```./00_training_and_inference/sgmsvs/sgmse```](https://github.com/pablebe/gensvs_eval/tree/main/00_training_and_inference/sgmsvs/sgmse) (from https://github.com/sp-uhh/sgmse)
+- [```./01_evaluation_and_correlation/pam_eval```](https://github.com/pablebe/gensvs_eval/tree/main/01_evaluation_and_correlation/pam_eval) (from https://github.com/soham97/PAM)
+- [```./01_evaluation_and_correlation/peass_v2.0.1```](https://github.com/pablebe/gensvs_eval/tree/main/01_evaluation_and_correlation/peass_v2.0.1) (from https://gitlab.inria.fr/bass-db/peass/-/tree/master/v2.0.1)
+- [```./00_training_and_inference/bigvgan_utils```](https://github.com/pablebe/gensvs_eval/tree/main/00_training_and_inference/bigvgan_utils) (from https://github.com/NVIDIA/BigVGAN)
+- [```./00_training_and_inference/baseline_models/backbones```](https://github.com/pablebe/gensvs_eval/tree/main/00_training_and_inference/baseline_models/backbones) (from https://github.com/ZFTurbo/Music-Source-Separation-Training and https://github.com/KimberleyJensen/Mel-Band-Roformer-Vocal-Model)
+
+## References and Acknowledgements
 The inference code for the SGMSVS model was built upon the code made available in:
 ```bib
 @article{richter2023speech,
@@ -258,5 +223,21 @@ For [Music2Latent](https://github.com/SonyCSLParis/music2latent):
   pages        = {111-119},
   venue        = {San Francisco, California, USA and Online},
   doi          = {10.5281/zenodo.14877289},
+}
+```
+
+## Citation
+If you use any parts of our code, our data or the gensvs package in your work, please cite our paper and the work that formed the basis of this research.
+
+Our paper can be cited with:
+```bib
+@misc{bereuter2025,
+      title={Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation Models}, 
+      author={Paul A. Bereuter and Benjamin Stahl and Mark D. Plumbley and Alois Sontacchi},
+      year={2025},
+      eprint={2507.11427},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS},
+      url={https://arxiv.org/abs/2507.11427}, 
 }
 ```
