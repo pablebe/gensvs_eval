@@ -23,16 +23,16 @@ We have released a [PyPi package](https://pypi.org/project/gensvs/) that enables
 1. Create conda environment: ```$ ./env_info/gensvs_env.yml```
 2. Activate conda environment ```$ conda activate gensvs_env```
 2. Install [gensvs](https://pypi.org/project/gensvs/) package: ```$ pip install gensvs```
-3. [Alternative] Run Bash script that sets up conda environment and installs [gensvs](https://pypi.org/project/gensvs/) from root directory: ```$ ./env_info/setup_gensvs_env.sh```
+3. [Alternative] Run Bash script that sets up conda environment and installs [gensvs](https://pypi.org/project/gensvs/) from root directory: [```$ ./env_info/setup_gensvs_env.sh```](https://github.com/pablebe/gensvs_eval/blob/main/env_info/setup_gensvs_env.sh)
 
 ### II. ```gensvs_eval_env```: Conda environment for computation of all non-embedding-based intrusive and non-intrusive metrics and for the correlation analysis
 Set up the following environment for evaluating all non-intrusive metrics of the paper, as well as for plot and *.csv export.
 1. Create conda environment: ```$ ./env_info/svs_eval_env.yml```
 2. Activate conda environment: ```$ conda activate gensvs_eval_env```
 2. Install additional python dependencies: ```$ pip install -r ./env_info/svs_eval_env.txt```
-3. Build the ViSQOL API according to instructions of https://github.com/google/visqol and place in folder within the root directory
+3. Build the [ViSQOL API](https://github.com/google/visqol) and place in folder within the root directory
    - >**Note:** URL and SHA256 of Armadillo headers in the file "WORKSPACE" need to be changed to a recent version (https://sourceforge.net/projects/arma/files/)
-4. To compute metrics with the PEASS-toolkit in the folder ```./01_evaluation_and_correlation/peass_v2.0.1``` Matlab (version<2025a) is required to execute Python's Matlab engine   
+4. To compute metrics with the PEASS-toolkit in the folder [```./01_evaluation_and_correlation/peass_v2.0.1```](https://github.com/pablebe/gensvs_eval/tree/main/01_evaluation_and_correlation/peass_v2.0.1) Matlab (version<2025a) is required to execute Python's Matlab engine   
 
 ### III. ```gensvs_fad_mse_eval_env```: Conda environment for evaluation intrusive embedding-based metrics
 For computation of FAD and MSE evaluation metrics in addition to MERT/Music2Latent MSEs you'll need an additional conda environment. Please follow the steps below to set the environment up:
