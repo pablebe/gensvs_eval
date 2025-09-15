@@ -504,6 +504,8 @@ if SAVE_FIGURES:
         plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'violin_plot.pdf'), format='pdf', bbox_inches='tight')
     else:
         plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'violin_plot_no_significance.pdf'), format='pdf', bbox_inches='tight')
+        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'violin_plot_no_significance.svg'), format='svg', bbox_inches='tight')
+
 #correlation scatter plot
 metric_short_label_dict = {
                      'sar': 'SAR',
@@ -713,6 +715,7 @@ ax.set_ylabel('$\mathregular{SRCC_{gen}}$')
 ax.tick_params(axis='y',labelsize=14)
 plt.tight_layout()
 if SAVE_FIGURES:
+        plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.svg'), format='svg', bbox_inches='tight')
         plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.pdf'), format='pdf', bbox_inches='tight')
         plt.savefig(os.path.join(os.path.join(OUT_PATH,'figures'),'gen_disc_srcc_tradeoff.png'), format='png',dpi=300, bbox_inches='tight')
 
