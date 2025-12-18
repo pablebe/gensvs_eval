@@ -231,13 +231,15 @@ If you use any parts of our code, our data or the gensvs package in your work, p
 
 Our paper can be cited with:
 ```bib
-@misc{bereuter2025,
-      title={Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation Models}, 
-      author={Paul A. Bereuter and Benjamin Stahl and Mark D. Plumbley and Alois Sontacchi},
-      year={2025},
-      eprint={2507.11427},
-      archivePrefix={arXiv},
-      primaryClass={eess.AS},
-      url={https://arxiv.org/abs/2507.11427}, 
-}
+@INPROCEEDINGS{bereuter2025,
+  author={Bereuter, Paul A. and Stahl, Benjamin and Plumbley, Mark D. and Sontacchi, Alois},
+  booktitle={2025 IEEE Workshop on Applications of Signal Processing to Audio and Acoustics (WASPAA)}, 
+  title={Towards Reliable Objective Evaluation Metrics for Generative Singing Voice Separation Models}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={1-5},
+  keywords={Measurement;Degradation;Training;Time-frequency analysis;Correlation;Limiting;Computational modeling;Conferences;Reliability;Software development management},
+  doi={10.1109/WASPAA66052.2025.11230934}
+  }
 ```
